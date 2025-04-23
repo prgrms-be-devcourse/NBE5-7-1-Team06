@@ -1,5 +1,6 @@
 package kr.co.programmers.cafe.domain.admin;
 
+import kr.co.programmers.cafe.domain.item.ItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/admin")
 public class AdminController {
 
+    private final ItemService itemService;
     //    private final AdminService adminService;
 
     // 로그인 실패의 경우 error 를 로그인 페이지로 넘겨주기 위한 메서드
@@ -35,5 +37,11 @@ public class AdminController {
     public String adminManage() {
         log.info("관리 페이지 호출 테스트 - 로그인 성공");
         return "admin/manage-form";
+    }
+
+    @GetMapping("/items")
+    public String readItems(Model model){
+        model.addAttribute("items", itemService.findAll());
+        return "admin/items/item-list";
     }
 }
