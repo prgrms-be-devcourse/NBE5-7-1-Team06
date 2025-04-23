@@ -20,6 +20,10 @@ public class FileManager {
         }
     }
 
+    public String getAbsolutePath(String filePath) {
+        return IMAGE_DIRECTORY + "/" + filePath;
+    }
+
     //이미지 파일을 home/devcourse/images/에 저장합니다.
     public String saveFile(MultipartFile file) {
         if (file.isEmpty()) {
