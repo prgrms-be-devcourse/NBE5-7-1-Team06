@@ -6,10 +6,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
-public class ItemCreateRequest {
+public class ItemEditForm {
+    private Long id;
     private String name;
     private String category;
     private int price;
     private MultipartFile image;
-    
+    private String imageUrl;
+
 }
