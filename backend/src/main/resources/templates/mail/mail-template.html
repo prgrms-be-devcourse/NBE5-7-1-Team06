@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>구매 내역 안내</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            max-width: 600px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #6f4e37;
+            margin-bottom: 10px;
+        }
+        .info, .summary {
+            margin-bottom: 20px;
+        }
+        .summary table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .summary th, .summary td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>☕ 커피 구매 내역 안내</h2>
+
+    <div class="info">
+        <p><strong>주문번호:</strong> <span th:text="${orderId}">주문번호</span></p>
+        <p><strong>주문일:</strong> <span th:text="${orderedAt}">YYYY-MM-DD</span></p>
+        <p><strong>주소:</strong> <span th:text="${address}">주소</span></p>
+        <p><strong>우편번호:</strong> <span th:text="${zipCode}">우편번호</span></p>
+    </div>
+
+    <div class="summary">
+        <h3>주문 상품</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>상품명</th>
+                <th>수량</th>
+                <th>단가</th>
+                <th>합계</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${items}">
+                <td th:text="${item.name}">상품명</td>
+                <td th:text="${item.quantity}">수량</td>
+                <td th:text="${item.price}">단가</td>
+                <td th:text="${#numbers.formatInteger(item.getPrice * item.getQuantity, 0, 'COMMA')} + '원'">합계</td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="total">
+            총 결제 금액: <span th:text="${#numbers.formatInteger(totalPrice, 0, 'COMMA')} + '원'">총 결제 금액</span>
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>저희 IPv6 카페를 이용해주셔서 감사합니다. 즐거운 하루 되세요! 😊</p>
+    </div>
+</div>
+</body>
+</html>
