@@ -1,0 +1,39 @@
+package kr.co.programmers.cafe.domain.order.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class OrderItem {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    @NotNull
+    private Integer quantity;
+
+    @Builder
+    public OrderItem(Item item, Integer quantity) {
+        this.item = item;
+        this.quantity = quantity;
+    }
+
+    public void assignOrder(Order order) {
+        this.order = order;
+    }
+}
