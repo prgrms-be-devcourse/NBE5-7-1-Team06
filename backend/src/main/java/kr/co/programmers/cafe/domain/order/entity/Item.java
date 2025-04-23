@@ -40,4 +40,19 @@ public class Item {
         this.category = category;
         this.image = image;
     }
+
+    public void update(String name, Integer price, Category category, String image) {
+        if(name != null) {
+            this.name = name;
+        }
+        if(price != null) {
+            this.price = price;
+        }
+        if(category != null) {
+            this.category = category;
+        }
+        if(image != null) {
+            this.image = image;
+        }
+    }
 }

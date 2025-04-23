@@ -9,25 +9,25 @@
 <h1 class="page-title">상품 생성</h1>
 
 <form th:action="@{/admin/items}" method="post" enctype="multipart/form-data" class="form-container"
-      th:object="${itemCreateRequest}">
+      th:object="${itemCreateForm}">
 <div class="form-field">
         <label for="name" class="form-label">상품명:</label>
     <input type="text" id="name" name="name" required class="form-input"
-           th:value="${itemCreateRequest?.name}">
+           th:value="${itemCreateForm?.name}">
 </div>
 
     <div class="form-field">
         <label for="category" class="form-label">카테고리:</label>
         <select id="category" name="category" required class="form-input">
-            <option value="Coffee" th:selected="${itemCreateRequest?.category == 'Coffee'}">커피</option>
-            <option value="NonCoffee" th:selected="${itemCreateRequest?.category == 'NonCoffee'}">음료</option>
+            <option value="Coffee" th:selected="${itemCreateForm?.category == 'Coffee'}">커피</option>
+            <option value="NonCoffee" th:selected="${itemCreateForm?.category == 'NonCoffee'}">음료</option>
         </select>
     </div>
 
     <div class="form-field">
         <label for="price" class="form-label">가격:</label>
         <input type="number" id="price" name="price" required class="form-input"
-               th:value="${itemCreateRequest?.price}">
+               th:value="${itemCreateForm?.price}">
     </div>
 
     <div class="form-field">
