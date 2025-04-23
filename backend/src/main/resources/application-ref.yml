@@ -21,6 +21,13 @@ spring:
   profiles:
     active: prod
 
+  # 관리자 계정
+  security:
+    user:
+      name: example
+      password: example
+      roles: ADMIN
+
 ---
 # dev profile
 spring:
