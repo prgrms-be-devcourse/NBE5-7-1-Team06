@@ -19,4 +19,6 @@ public class OrderRequest {
 
     private List<OrderItemRequest> orderItemRequests;
 
+    private Integer totalPrice;
+
 }

@@ -40,9 +40,15 @@ public class OrderService {
         }).toList();
 
         // 주문 아이템 리스트에서 각 아이템의 가격 * 수량을 곱해서 총 가격 계산
-        int totalPrice = orderItemList.stream().mapToInt(
+        int totalPriceService = orderItemList.stream().mapToInt(
                 orderItem -> orderItem.getItem().getPrice() * orderItem.getQuantity()
         ).sum();
+
+        Integer totalPriceClient = request.getTotalPrice();
+
+        if (!isEqualPrice(totalPriceService, totalPriceClient)) {
+            throw new IllegalArgumentException("총 가격이 서버 계산 값과 일치하지 않습니다.");
+        }
 
         // order 엔티티 생성
         Order order = Order.builder()
@@ -50,7 +56,7 @@ public class OrderService {
                 .address(request.getAddress())
                 .zipCode(request.getZipCode())
                 .orderItems(orderItemList)
-                .totalPrice(totalPrice)
+                .totalPrice(totalPriceService)
                 .build();
 
         // 각 OrderItem 객체에 생성된 주문을 할당
@@ -58,5 +64,9 @@ public class OrderService {
 
         // 만든 주문을 DB에 저장하고, 생성된 주문의 ID를 반환
         return orderRepository.save(order).getId();
+    }
+
+    private boolean isEqualPrice(Integer clientPrice, int servicePrice) {
+        return clientPrice != null && clientPrice == servicePrice;
     }
 }
