@@ -1,7 +1,6 @@
 package kr.co.programmers.cafe.domain.order.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,16 +22,16 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @Column(nullable = false)
     private String email;
 
-    @NotNull
+    @Column(nullable = false)
     private String address;
 
-    @NotNull
+    @Column(nullable = false)
     private String zipCode;
 
-    @NotNull
+    @Column(nullable = false)
     private LocalDateTime orderedAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
@@ -41,7 +40,7 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
-    @NotNull
+    @Column(nullable = false)
     private Integer totalPrice;
 
     @Builder

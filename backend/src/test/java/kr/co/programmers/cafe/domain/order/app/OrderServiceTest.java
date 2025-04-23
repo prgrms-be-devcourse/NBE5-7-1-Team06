@@ -5,6 +5,7 @@ import kr.co.programmers.cafe.domain.order.dto.OrderItemRequest;
 import kr.co.programmers.cafe.domain.order.dto.OrderRequest;
 import kr.co.programmers.cafe.domain.order.entity.Category;
 import kr.co.programmers.cafe.domain.order.entity.Item;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,15 +15,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Slf4j
 class OrderServiceTest {
 
     @Autowired
@@ -36,7 +37,6 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 테스트용 아이템이 DB에 없으면 추가
         itemRepository.saveAll(List.of(
                 Item.builder()
                         .name("Americano")
@@ -57,6 +57,8 @@ class OrderServiceTest {
     @DisplayName("주문 생성 테스트")
     void createOrderTest() throws Exception {
 
+        log.info("Starting createOrderTest...");
+
         OrderRequest request = new OrderRequest("test@email.com", "Test Address", "00000",
                 List.of(
                         new OrderItemRequest(1L, 2),
@@ -64,10 +66,10 @@ class OrderServiceTest {
                 )
         );
 
-        // when & then: MockMvc를 통해 POST 요청을 보내고 응답을 확인
-        mockMvc.perform(post("/api/order")
+        // POST 요청
+        var result = mockMvc.perform(post("/api/order")
                         .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                        .content("""
                                 {
                                   "email": "test@example.com",
                                   "address": "Test Address",
@@ -80,6 +82,10 @@ class OrderServiceTest {
                                 """)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isNotEmpty());  // 반환된 ID가 비어있지 않음을 확인
+                .andReturn();
+
+        assertThat(result.getResponse().getContentAsString()).isNotEmpty();
+
+        log.info("createOrder로 생성된 주문 ID: {}", result.getResponse().getContentAsString());
     }
 }
