@@ -1,0 +1,138 @@
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 340px;
+    height: 100%;
+    background-color: #f9f5f0;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; 
+    font-family: 'Pretendard', sans-serif;
+    gap: 24px;
+  }
+  
+  .cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .cart-header h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #5c3f2e;
+    margin: 0;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6f4e37;
+    cursor: pointer;
+  }
+  
+  .cart-items {
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px); /* 장바구니 아이템에 대해 고정된 공간 할당 */
+  }
+  
+  .empty-cart {
+    text-align: center;
+    color: #a78d72;
+    font-size: 15px;
+    margin-top: 50px;
+  }
+  
+  .cart-item {
+    background-color: rgb(255, 255, 255);
+    border-radius: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .item-name {
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .item-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+  
+  .item-controls button {
+    padding: 6px 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 2px solid #6f4e37;
+    background-color: white;
+    color: #6f4e37;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .item-controls button:hover {
+    background-color: #e9ded0;
+  }
+  
+  .item-price {
+    font-size: 14px;
+    color: #666;
+    text-align: right;
+    margin-top: 8px;
+  }
+  
+  .checkout-button {
+    padding: 12px 32px;
+    background-color: #6f4e37;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: auto; 
+    margin-bottom: 50px;
+  }
+  
+  .checkout-button:hover {
+    background-color: #5c3f2e;
+  }
+
+  .user-info-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  
+  .user-info-form input {
+    padding: 10px 16px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: 'Pretendard', sans-serif;
+  }
+
+  .total-price {
+    border-top: 2px solid #ddd;
+    padding: 16px 10px 10px;
+    margin: 20px 0 10px;
+    font-size: 1.2rem;
+    font-weight: 400;
+    background-color: #f9f9f9;
+    text-align: right;
+    border-radius: 6px;
+  }
