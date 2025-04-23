@@ -9,11 +9,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final IpValidationFilter ipValidationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -26,20 +29,13 @@ public class SecurityConfig {
                 .securityMatcher("/admin/**")
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/login").permitAll()
-                        .requestMatchers("/admin/**").access((authentication, context) -> {
-                            var request = context.getRequest();
-                            var ip = request.getRemoteAddr();
-                            var isLocal = "127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip);
-                            var hasAdminRole = authentication.get().getAuthorities().stream()
-                                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-                            return new AuthorizationDecision(isLocal && hasAdminRole);
-                        })
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                 )
                 .formLogin(form -> form
                         .loginPage("/admin/login")
                         .loginProcessingUrl("/admin/login")
                         .defaultSuccessUrl("/admin/manage")
-                        .failureUrl("/admin/login?error")
+                        .failureUrl("/admin/login?error=login_failed")
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -49,7 +45,8 @@ public class SecurityConfig {
                         .clearAuthentication(true))
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/api/**")
-                );
+                )
+                .addFilterBefore(ipValidationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
