@@ -1,8 +1,6 @@
 package kr.co.programmers.cafe.domain.order.app;
 
 import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
-import kr.co.programmers.cafe.domain.order.dto.OrderItemRequest;
-import kr.co.programmers.cafe.domain.order.dto.OrderRequest;
 import kr.co.programmers.cafe.domain.order.entity.Category;
 import kr.co.programmers.cafe.domain.order.entity.Item;
 import lombok.extern.slf4j.Slf4j;
@@ -30,13 +28,11 @@ class OrderServiceTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private OrderService orderService;
-
-    @Autowired
     private ItemRepository itemRepository;
 
     @BeforeEach
     void setUp() {
+        // 미리 주문 가능한 아이템들을 저장
         itemRepository.saveAll(List.of(
                 Item.builder()
                         .name("Americano")
@@ -59,33 +55,32 @@ class OrderServiceTest {
 
         log.info("Starting createOrderTest...");
 
-        OrderRequest request = new OrderRequest("test@email.com", "Test Address", "00000",
-                List.of(
-                        new OrderItemRequest(1L, 2),
-                        new OrderItemRequest(2L, 3)
-                )
-        );
+        // JSON 데이터로 요청 본문 작성
+        String requestBody = """
+                {
+                  "email": "test@example.com",
+                  "address": "Test Address",
+                  "zipCode": "12345",
+                  "orderItemRequests": [
+                    { "itemId": 1, "quantity": 2 },
+                    { "itemId": 2, "quantity": 1 }
+                  ],
+                  "totalPrice": 10500
+                }
+                """;
 
         // POST 요청
         var result = mockMvc.perform(post("/api/order")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "email": "test@example.com",
-                                  "address": "Test Address",
-                                  "zipCode": "12345",
-                                  "orderItemRequests": [
-                                    { "itemId": 1, "quantity": 2 },
-                                    { "itemId": 2, "quantity": 1 }
-                                  ]
-                                }
-                                """)
+                        .content(requestBody)
                 )
-                .andExpect(status().isOk())
+                .andExpect(status().isOk())  // 응답 상태 코드가 200 OK인지 확인
                 .andReturn();
 
-        assertThat(result.getResponse().getContentAsString()).isNotEmpty();
+        // 생성된 주문 ID 확인
+        String orderId = result.getResponse().getContentAsString();
+        assertThat(orderId).isNotEmpty();  // 주문 ID가 비어있지 않음을 확인
 
-        log.info("createOrder로 생성된 주문 ID: {}", result.getResponse().getContentAsString());
+        log.info("createOrder로 생성된 주문 ID: {}", orderId);
     }
 }
