@@ -65,7 +65,7 @@ class OrderServiceTest {
                     { "itemId": 1, "quantity": 2 },
                     { "itemId": 2, "quantity": 1 }
                   ],
-                  "totalPrice": 10500
+                  "totalPrice": 8500
                 }
                 """;
 
