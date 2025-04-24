@@ -113,7 +113,7 @@ class OrderServiceTest {
         List<OrderResponse> allOrders = orderService.getAllOrders();
 
         // then
-        assertThat(allOrders).hasSizeGreaterThanOrEqualTo(2);
+        assertThat(allOrders).isEqualTo(2);
         assertThat(allOrders).extracting("orderId").contains(orderId1, orderId2);
         log.info(allOrders.toString());
 
