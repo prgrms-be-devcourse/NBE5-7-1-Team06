@@ -1,17 +1,25 @@
 package kr.co.programmers.cafe.domain.admin;
 
+import kr.co.programmers.cafe.domain.item.app.ItemService;
+import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
 import kr.co.programmers.cafe.domain.order.app.OrderService;
 import kr.co.programmers.cafe.domain.order.dto.OrderResponse;
-import kr.co.programmers.cafe.domain.order.dto.OrderStatusChangeRequest;
+import kr.co.programmers.cafe.domain.order.entity.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import kr.co.programmers.cafe.domain.order.entity.Status;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.List;
 
 @Slf4j
@@ -20,14 +28,14 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
-    //    private final AdminService adminService;
+    private final ItemService itemService;
     private final OrderService orderService;
 
     // 로그인 실패의 경우 error 를 로그인 페이지로 넘겨주기 위한 메서드
     @GetMapping("/login")
     public String adminLogin(@RequestParam(required = false) String error, Model model) {
         log.info("로그인 페이지");
-        if(error != null) {
+        if (error != null) {
             switch (error) {
                 case "ip_blocked" -> model.addAttribute("errorMessage", "외부 IP 에선 접속이 불가능합니다!");
                 case "login-failed" -> model.addAttribute("errorMessage", "올바르지 않은 계정입니다!");
@@ -44,24 +52,51 @@ public class AdminController {
         return "admin/manage-form";
     }
 
-
-    @GetMapping("/items")
-    public String items(Model model) {
-        /*Item item = Item.builder().name("상품1").price(1000).id(1L).category(Item.Category.Coffee).imageUrl("temp.png").build();
-        List<Item> items = new ArrayList<>();
-        items.add(item);
-        model.addAttribute("items", items);*/
-        return "items/item-list";
+    @GetMapping("/main")
+    public String adminMain() {
+        return "admin/main";
     }
 
-    @GetMapping
-    public String main(){
-        return "main";
+    @GetMapping("/items")
+    public String readItems(Model model, @RequestParam(defaultValue = "0") int page) {
+        model.addAttribute("items", itemService.findAll(PageRequest.of(page, 10)));
+        return "admin/items/item-list";
+    }
+
+    @GetMapping("/items/new")
+    public String createItemForm(ItemCreateForm itemCreateForm) {
+        return "admin/items/item-new";
+    }
+
+    @PostMapping("/items")
+    public String createItem(ItemCreateForm itemCreateForm) {
+        log.info("아이템 생성 시도");
+        itemService.create(itemCreateForm);
+        log.info("아이템 생성 성공");
+        return "redirect:/admin/items";
+    }
+
+    @GetMapping("/items/edit/{itemId}")
+    public String editItemForm(@PathVariable Long itemId, ItemEditForm itemEditForm) {
+        ItemResponse itemResponse = itemService.findById(itemId);
+        itemEditForm.setId(itemId);
+        itemEditForm.setName(itemResponse.getName());
+        itemEditForm.setPrice(itemResponse.getPrice());
+        itemEditForm.setCategory(itemResponse.getCategory().name());
+        itemEditForm.setImageUrl(itemResponse.getImageName());
+        return "admin/items/item-edit";
+    }
+
+    @PatchMapping("/items/edit/{itemId}")
+    public String editItem(@PathVariable Long itemId, ItemEditForm itemEditForm) {
+        itemEditForm.setId(itemId);
+        itemService.edit(itemEditForm);
+        return "redirect:/admin/items";
     }
 
     @DeleteMapping("/items/{itemId}")
-    public String deleteItems(@PathVariable Long itemId){
-        log.info("itemId={} Deleted", itemId);
+    public String deleteItem(@PathVariable Long itemId) {
+        itemService.delete(itemId);
         return "redirect:/admin/items";
     }
 

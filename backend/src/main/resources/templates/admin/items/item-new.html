@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상품 생성</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<h1 class="page-title">상품 생성</h1>
+
+<form th:action="@{/admin/items}" method="post" enctype="multipart/form-data" class="form-container"
+      th:object="${itemCreateForm}">
+    <div class="form-field">
+        <label for="name" class="form-label">상품명:</label>
+        <input type="text" id="name" name="name" required class="form-input"
+               th:value="${itemCreateForm?.name}">
+    </div>
+
+    <div class="form-field">
+        <label for="category" class="form-label">카테고리:</label>
+        <select id="category" name="category" required class="form-input">
+            <option value="A" th:selected="${itemCreateForm?.category == 'A'}">A</option>
+            <option value="B" th:selected="${itemCreateForm?.category == 'B'}">B</option>
+            <option value="C" th:selected="${itemCreateForm?.category == 'C'}">C</option>
+        </select>
+    </div>
+
+    <div class="form-field">
+        <label for="price" class="form-label">가격:</label>
+        <input type="number" id="price" name="price" required class="form-input"
+               th:value="${itemCreateForm?.price}">
+    </div>
+
+    <div class="form-field">
+        <label for="image" class="form-label">이미지:</label>
+        <input type="file" id="image" name="image" accept="image/*" required class="form-input">
+    </div>
+
+    <div class="button-container">
+        <button type="submit" class="btn btn-save">저장</button>
+        <a href="/admin/items">
+            <button type="button" class="btn btn-cancel">취소</button>
+        </a>
+    </div>
+</form>
+</body>
+</html>

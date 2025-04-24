@@ -20,6 +20,11 @@ spring:
 
   profiles:
     active: prod
+  #View 에서 요청 구분
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
 
   # 관리자 계정
   security:
