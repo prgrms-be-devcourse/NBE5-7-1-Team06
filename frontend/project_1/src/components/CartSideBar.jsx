@@ -10,6 +10,13 @@ export default function CartSideBar({ cartItems, onUpdateQuantity, onClose }) {
     const [addressDetail, setAddressDetail] = useState("");
     const [zipcode, setZipcode] = useState("");
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+      
+    // 총 금액 계산
+    const totalPrice = cartItems.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+      );
   
     const handleCheckout = async () => {
       if(!cartItems || cartItems.length === 0) {
@@ -31,10 +38,12 @@ export default function CartSideBar({ cartItems, onUpdateQuantity, onClose }) {
         email,
         address: address + " " + addressDetail,
         zipCode: zipcode,
+        totalPrice,
         orderItemRequests: cartItems.map(item => ({
           itemId: item.id,
           quantity: item.quantity,
         })),
+
       };
   
       try {
@@ -52,12 +61,6 @@ export default function CartSideBar({ cartItems, onUpdateQuantity, onClose }) {
       const regex = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/;
       return regex.test(email);
     };
-  
-    // 총 금액 계산
-    const totalPrice = cartItems.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
   
     return (
       <div className="cart-sidebar">
