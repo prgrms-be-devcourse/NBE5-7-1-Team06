@@ -50,5 +50,12 @@ public class Order {
         this.zipCode = zipCode;
         this.orderItems = orderItems;
         this.totalPrice = totalPrice;
+        this.orderedAt = LocalDateTime.now();
+        this.status = Status.ORDERED;
+    }
+
+    //상태 변경 메서드
+    public void changeStatus(Status newStatus) {
+        this.status = newStatus;
     }
 }

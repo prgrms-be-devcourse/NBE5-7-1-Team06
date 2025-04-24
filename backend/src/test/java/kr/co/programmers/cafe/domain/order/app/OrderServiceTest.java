@@ -1,8 +1,11 @@
 package kr.co.programmers.cafe.domain.order.app;
 
 import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
+import kr.co.programmers.cafe.domain.order.dto.OrderItemRequest;
+import kr.co.programmers.cafe.domain.order.dto.OrderRequest;
 import kr.co.programmers.cafe.domain.order.entity.Category;
 import kr.co.programmers.cafe.domain.order.entity.Item;
+import kr.co.programmers.cafe.domain.order.entity.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +32,7 @@ class OrderServiceTest {
 
     @Autowired
     private ItemRepository itemRepository;
+
 
     @BeforeEach
     void setUp() {
@@ -83,4 +87,5 @@ class OrderServiceTest {
 
         log.info("createOrder로 생성된 주문 ID: {}", orderId);
     }
+
 }
