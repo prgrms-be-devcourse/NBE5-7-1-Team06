@@ -8,6 +8,8 @@ import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import kr.co.programmers.cafe.global.util.FileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,6 +61,18 @@ public class ItemService {
                 .map(ItemResponse::of)
                 .toList();
     }
+
+    /**
+     * 페이징을 지원하는 전체 아이템 조회
+     *
+     * @param pageable 페이징 정보
+     * @return 페이징된 ItemResponse 목록
+     */
+    public Page<ItemResponse> findAll(Pageable pageable) {
+        return itemRepository.findAll(pageable)
+                .map(ItemResponse::of);
+    }
+    
 
     public ItemResponse findById(Long id) throws ItemNotFoundException {
         return ItemResponse.of(itemRepository.findById(id).orElseThrow(

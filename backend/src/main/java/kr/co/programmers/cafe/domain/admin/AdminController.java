@@ -7,6 +7,7 @@ import kr.co.programmers.cafe.domain.item.ItemService;
 import kr.co.programmers.cafe.global.util.FileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,8 +61,8 @@ public class AdminController {
     }
 
     @GetMapping("/items")
-    public String readItems(Model model) {
-        model.addAttribute("items", itemService.findAll());
+    public String readItems(Model model, @RequestParam(defaultValue = "0") int page) {
+        model.addAttribute("items", itemService.findAll(PageRequest.of(page, 10)));
         return "admin/items/item-list";
     }
 

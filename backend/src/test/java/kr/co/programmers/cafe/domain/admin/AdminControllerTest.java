@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -74,7 +76,8 @@ class AdminControllerTest {
     @WithMockUser(roles = "ADMIN")
     void getItems_Success() throws Exception {
         List<ItemResponse> items = List.of(testItem);
-        given(itemService.findAll()).willReturn(items);
+        Page<ItemResponse> page = new PageImpl<>(items);
+        given(itemService.findAll(any())).willReturn(page);
 
         mockMvc.perform(get("/admin/items"))
                 .andExpect(status().isOk())

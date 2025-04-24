@@ -8,8 +8,9 @@
 <body>
 <h1 class="page-title">상품 수정</h1>
 
-<form th:action="@{'/admin/items/edit/' + ${itemEditForm.id}}" method="post" enctype="multipart/form-data" class="form-container"
-      th:object="${itemEditForm}">
+<form th:action="@{'/admin/items/edit/' + ${itemEditForm.id}}" method="post" enctype="multipart/form-data"
+      class="form-container"
+      th:object="${itemEditForm}" onsubmit="return confirm('정말로 이렇게 수정 하시겠습니까?');">
     <input type="hidden" name="_method" value="patch"/>
     <intpu type="hidden" name="id" th:value="${itemEditForm.id}"/>
     <div class="form-field">
@@ -39,7 +40,9 @@
     </div>
 
     <div class="form-field image-container" style="text-align: center;">
-        <img th:if="${itemEditForm.imageUrl != null}" th:src="@{'/admin/display-image/' + ${itemEditForm.imageUrl}}" alt="상품 이미지" style="max-width: 300px; height: auto;">
+        <img th:if="${itemEditForm.imageUrl != null}"
+             th:src="@{'/admin/display-image/' + ${itemEditForm.imageUrl}}" alt="상품 이미지"
+             style="max-width: 300px; height: auto;">
     </div>
 
     <div class="button-container">

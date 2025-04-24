@@ -21,6 +21,36 @@ td {
     text-align: right;
 }
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 8px;
+}
+
+.page-numbers a {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.page-numbers a:hover {
+    background-color: #f5f5f5;
+}
+
+.page-numbers a.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
 /* Common Button Styles */
 .btn {
     padding: 10px 20px;
