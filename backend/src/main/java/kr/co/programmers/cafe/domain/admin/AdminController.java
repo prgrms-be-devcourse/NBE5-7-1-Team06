@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.File;
 import java.io.IOException;
 
 @Slf4j
@@ -38,7 +37,7 @@ public class AdminController {
     @GetMapping("/login")
     public String adminLogin(@RequestParam(required = false) String error, Model model) {
         log.info("로그인 페이지");
-        if(error != null) {
+        if (error != null) {
             switch (error) {
                 case "ip_blocked" -> model.addAttribute("errorMessage", "외부 IP 에선 접속이 불가능합니다!");
                 case "login-failed" -> model.addAttribute("errorMessage", "올바르지 않은 계정입니다!");
@@ -61,25 +60,20 @@ public class AdminController {
     }
 
     @GetMapping("/items")
-    public String readItems(Model model){
+    public String readItems(Model model) {
         model.addAttribute("items", itemService.findAll());
         return "admin/items/item-list";
     }
 
     @GetMapping("/items/new")
-    public String createItemForm(ItemCreateForm itemCreateForm){
+    public String createItemForm(ItemCreateForm itemCreateForm) {
         return "admin/items/item-new";
     }
 
     @PostMapping("/items")
-    public String createItem(ItemCreateForm itemCreateForm){
-        try {
-            log.info("아이템 생성 시도");
-            itemService.create(itemCreateForm);
-        } catch( Exception e ){
-            log.info("아이템 생성 실패");
-            return "admin/items/item-new";
-        }
+    public String createItem(ItemCreateForm itemCreateForm) {
+        log.info("아이템 생성 시도");
+        itemService.create(itemCreateForm);
         log.info("아이템 생성 성공");
         return "redirect:/admin/items";
     }
@@ -95,7 +89,7 @@ public class AdminController {
     }
 
     @GetMapping("/items/edit/{itemId}")
-    public String editItemForm(@PathVariable Long itemId, ItemEditForm itemEditForm){
+    public String editItemForm(@PathVariable Long itemId, ItemEditForm itemEditForm) {
         ItemResponse itemResponse = itemService.findById(itemId);
         itemEditForm.setId(itemId);
         itemEditForm.setName(itemResponse.getName());
@@ -106,21 +100,14 @@ public class AdminController {
     }
 
     @PatchMapping("/items/edit/{itemId}")
-    public String editItem(@PathVariable Long itemId,ItemEditForm itemEditForm){
+    public String editItem(@PathVariable Long itemId, ItemEditForm itemEditForm) {
         itemEditForm.setId(itemId);
-        try {
-            log.info("아이템 수정 시도");
-            itemService.edit(itemEditForm);
-        } catch( Exception e ){
-            log.info("아이템 생성 실패");
-            return "admin/items/item-new";
-        }
-        log.info("아이템 생성 성공");
+        itemService.edit(itemEditForm);
         return "redirect:/admin/items";
     }
 
     @DeleteMapping("/items/{itemId}")
-    public String deleteItem(@PathVariable Long itemId){
+    public String deleteItem(@PathVariable Long itemId) {
         itemService.delete(itemId);
         return "redirect:/admin/items";
     }

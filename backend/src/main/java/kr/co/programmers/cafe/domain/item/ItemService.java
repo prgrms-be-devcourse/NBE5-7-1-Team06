@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -48,8 +47,8 @@ public class ItemService {
      * @param id 삭제할 아이템의 ID
      * @throws ItemNotFoundException 주어진 ID의 아이템을 찾을 수 없는 경우
      */
-    public void delete(Long id){
-        Item item = itemRepository.findById(id).orElseThrow(()->
+    public void delete(Long id) throws ItemNotFoundException {
+        Item item = itemRepository.findById(id).orElseThrow(() ->
                 new ItemNotFoundException(id));
         itemRepository.delete(item);
         fileManager.deleteFile(item.getImage());
@@ -61,13 +60,13 @@ public class ItemService {
                 .toList();
     }
 
-    public ItemResponse findById(Long id) {
+    public ItemResponse findById(Long id) throws ItemNotFoundException {
         return ItemResponse.of(itemRepository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException(id)
         ));
     }
 
-    
+
     /**
      * 제공된 정보로 기존 아이템을 업데이트합니다. 이미지가 제공된 경우,
      * 기존 이미지를 삭제하고 새로운 이미지로 교체합니다. 아이템이 존재하지 않는 경우
@@ -76,14 +75,13 @@ public class ItemService {
      * @param itemEditForm 이름, 가격, 카테고리 및 선택적 새 이미지 파일을 포함한
      *                     아이템의 업데이트된 상세 정보가 담긴 폼
      * @return 수정된 아이템 상세 정보가 포함된 {@code ItemResponse}
-     * @throws IOException 이미지 파일 작업 중 오류가 발생하는 경우
      */
-    public ItemResponse edit(ItemEditForm itemEditForm) throws IOException {
+    public ItemResponse edit(ItemEditForm itemEditForm) throws ItemNotFoundException {
         Item item = itemRepository.findById(itemEditForm.getId()).orElseThrow(
                 () -> new ItemNotFoundException(itemEditForm.getId())
         );
         String filePath = null;
-        if(!itemEditForm.getImage().isEmpty()){
+        if (!itemEditForm.getImage().isEmpty()) {
             fileManager.deleteFile(item.getImage());
             filePath = fileManager.saveFile(itemEditForm.getImage());
         }
@@ -93,4 +91,6 @@ public class ItemService {
                 filePath);
         return ItemResponse.of(itemRepository.save(item));
     }
+
+
 }

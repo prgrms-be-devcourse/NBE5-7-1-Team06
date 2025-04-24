@@ -1,6 +1,12 @@
 package kr.co.programmers.cafe.domain.order.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,7 +40,8 @@ public class Item {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Builder
-    public Item(String name, Integer price, Category category, String image) {
+    public Item(Long id, String name, Integer price, Category category, String image) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.category = category;
@@ -42,17 +49,18 @@ public class Item {
     }
 
     public void update(String name, Integer price, Category category, String image) {
-        if(name != null) {
+        if (name != null) {
             this.name = name;
         }
-        if(price != null) {
+        if (price != null) {
             this.price = price;
         }
-        if(category != null) {
+        if (category != null) {
             this.category = category;
         }
-        if(image != null) {
+        if (image != null) {
             this.image = image;
         }
+        updatedAt = LocalDateTime.now();
     }
 }
