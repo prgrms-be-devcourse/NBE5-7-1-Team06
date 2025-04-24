@@ -1,12 +1,19 @@
 package kr.co.programmers.cafe.domain.admin;
 
+import kr.co.programmers.cafe.domain.order.app.OrderService;
+import kr.co.programmers.cafe.domain.order.dto.OrderResponse;
+import kr.co.programmers.cafe.domain.order.dto.OrderStatusChangeRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import kr.co.programmers.cafe.domain.order.entity.Status;
+
+
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -15,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AdminController {
 
     //    private final AdminService adminService;
+    private final OrderService orderService;
 
     // 로그인 실패의 경우 error 를 로그인 페이지로 넘겨주기 위한 메서드
     @GetMapping("/login")
@@ -36,4 +44,31 @@ public class AdminController {
         log.info("관리 페이지 호출 테스트 - 로그인 성공");
         return "admin/manage-form";
     }
+
+    @GetMapping("/orders")
+    public String orderList(Model model) {
+        List<OrderResponse> allOrders = orderService.getAllOrders();
+        model.addAttribute("orders", allOrders);
+        return "admin/orders";
+    }
+
+    // 주문 상세 조회 페이지
+    @GetMapping("/order/{orderId}")
+    public String orderSearch(@PathVariable Long orderId, Model model) {
+        OrderResponse order = orderService.getOrderById(orderId);
+        model.addAttribute("order", order);
+        return "admin/order-search";
+    }
+
+    //관리자 - 주문 상태 변환 메서드
+    //PUT이 안되기 때문에 POST로
+    @PostMapping("/order/{orderId}/status")
+    public String changeOrderStatus(
+            @PathVariable Long orderId,
+            @RequestParam("status") Status status
+    ) {
+        orderService.changeOrderStatus(orderId, status);
+        return "redirect:/admin/orders";
+    }
+
 }
