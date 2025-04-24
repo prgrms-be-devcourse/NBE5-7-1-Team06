@@ -1,13 +1,9 @@
 package kr.co.programmers.cafe.domain.order.app;
 
-import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
-import kr.co.programmers.cafe.domain.order.dto.OrderItemRequest;
-import kr.co.programmers.cafe.domain.order.dto.OrderItemResponse;
-import kr.co.programmers.cafe.domain.order.dto.OrderRequest;
-import kr.co.programmers.cafe.domain.order.dto.OrderResponse;
-import kr.co.programmers.cafe.domain.order.entity.Category;
-import kr.co.programmers.cafe.domain.order.entity.Item;
-import kr.co.programmers.cafe.domain.order.entity.Status;
+
+import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
+import kr.co.programmers.cafe.domain.item.entity.Category;
+import kr.co.programmers.cafe.domain.item.entity.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,11 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc

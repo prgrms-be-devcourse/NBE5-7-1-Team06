@@ -5,8 +5,8 @@ import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
 import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
 import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
 import kr.co.programmers.cafe.domain.item.entity.Category;
+import kr.co.programmers.cafe.domain.order.app.OrderService;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
-import kr.co.programmers.cafe.global.util.FileManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ class AdminControllerTest {
     @MockitoBean
     private ItemService itemService;
     @MockitoBean
-    private FileManager fileManager;
+    private OrderService orderService;
 
     private ItemResponse testItem;
 
