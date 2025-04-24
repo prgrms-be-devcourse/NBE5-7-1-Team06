@@ -2,17 +2,24 @@ package kr.co.programmers.cafe.domain.order.app;
 
 
 import jakarta.transaction.Transactional;
-import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
-import kr.co.programmers.cafe.domain.item.entity.Item;
+import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.order.dao.OrderRepository;
+import kr.co.programmers.cafe.domain.order.dto.OrderItemResponse;
 import kr.co.programmers.cafe.domain.order.dto.OrderRequest;
+import kr.co.programmers.cafe.domain.order.dto.OrderResponse;
+import kr.co.programmers.cafe.domain.order.entity.Item;
 import kr.co.programmers.cafe.domain.order.entity.Order;
 import kr.co.programmers.cafe.domain.order.entity.OrderItem;
+import kr.co.programmers.cafe.domain.order.entity.Status;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +31,6 @@ public class OrderService {
     /**
      * 주문을 생성하고 생성된 주문의 ID를 반환합니다.
      * 사용자 예외 처리로 수정 예정
-     *
      * @param request 사용자로부터 받은 주문 요청
      * @return 생성된 주문의 ID
      */
@@ -70,4 +76,62 @@ public class OrderService {
     private boolean isEqualPrice(Integer clientPrice, int servicePrice) {
         return clientPrice != null && clientPrice == servicePrice;
     }
+
+    @Transactional
+    public OrderResponse getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("해당 주문을 찾을 수 없습니다. "));
+
+        List<OrderItemResponse> orderItemResponses = order.getOrderItems().stream()
+                .map(orderItem -> OrderItemResponse.builder()
+                        .name(orderItem.getItem().getName())
+                        .price(orderItem.getItem().getPrice())
+                        .quantity(orderItem.getQuantity())
+                        .build())
+                .toList();
+
+        return OrderResponse.builder()
+                .orderId(order.getId())
+                .email(order.getEmail())
+                .address(order.getAddress())
+                .zipCode(order.getZipCode())
+                .orderItems(orderItemResponses)
+                .totalPrice(order.getTotalPrice())
+                .status(order.getStatus())
+                .build();
+    }
+
+
+
+    @Transactional
+    public List<OrderResponse> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+
+        return orders.stream()
+                .map(order -> OrderResponse.builder()
+                        .orderId(order.getId())
+                        .email(order.getEmail())
+                        .address(order.getAddress())
+                        .zipCode(order.getZipCode())
+                        .totalPrice(order.getTotalPrice())
+                        .status(order.getStatus())
+                        .orderItems(order.getOrderItems().stream()
+                                .map(orderItem -> OrderItemResponse.builder()
+                                        .name(orderItem.getItem().getName())
+                                        .price(orderItem.getItem().getPrice())
+                                        .quantity(orderItem.getQuantity())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void changeOrderStatus(Long orderId, Status status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
+        order.changeStatus(status);
+    }
+
+
 }
