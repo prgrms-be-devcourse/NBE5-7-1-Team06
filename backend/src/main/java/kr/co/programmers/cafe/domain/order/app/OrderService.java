@@ -4,6 +4,9 @@ package kr.co.programmers.cafe.domain.order.app;
 import jakarta.transaction.Transactional;
 import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.item.entity.Item;
+import kr.co.programmers.cafe.domain.mail.dto.ItemMailSendRequest;
+import kr.co.programmers.cafe.domain.mail.dto.ReceiptMailSendRequest;
+import kr.co.programmers.cafe.domain.mail.service.MailService;
 import kr.co.programmers.cafe.domain.order.dao.OrderRepository;
 import kr.co.programmers.cafe.domain.order.dto.OrderItemResponse;
 import kr.co.programmers.cafe.domain.order.dto.OrderRequest;
@@ -15,6 +18,7 @@ import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +28,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
+    private final MailService mailService;
 
     /**
      * 주문을 생성하고 생성된 주문의 ID를 반환합니다.
@@ -35,12 +40,22 @@ public class OrderService {
     @Transactional
     public Long createOrder(OrderRequest request) {
 
+        // 주문 내역 상품 DTO 목록
+        List<ItemMailSendRequest> itemMailSendRequests = new ArrayList<>();
+
         // 사용자로부터 받은 주문 요청에서 주문 아이템 목록을 추출하여 OrderItem 객체 리스트로 변환
         List<OrderItem> orderItemList = request.getOrderItemRequests().stream().map(itemRequest -> {
             // 아이템을 찾아서, 해당 아이템과 수량으로 새로운 OrderItem을 생성
             Item findItem = itemRepository.findById(itemRequest.getItemId()).orElseThrow(
                     () -> new ItemNotFoundException(itemRequest.getItemId()) // 아이템을 찾을 수 없으면 예외 발생
             );
+
+            itemMailSendRequests.add(ItemMailSendRequest.builder()
+                    .name(findItem.getName())
+                    .price(findItem.getPrice())
+                    .quantity(itemRequest.getQuantity())
+                    .build());
+
             return new OrderItem(findItem, itemRequest.getQuantity());
         }).toList();
 
@@ -67,8 +82,24 @@ public class OrderService {
         // 각 OrderItem 객체에 생성된 주문을 할당
         orderItemList.forEach(orderItem -> orderItem.assignOrder(order));
 
-        // 만든 주문을 DB에 저장하고, 생성된 주문의 ID를 반환
-        return orderRepository.save(order).getId();
+        // 만든 주문을 DB에 저장
+        orderRepository.save(order);
+
+        // 주문 내역 DTO
+        ReceiptMailSendRequest receiptMailSendRequest = ReceiptMailSendRequest.builder()
+                .orderId(order.getId())
+                .mailAddress(order.getEmail())
+                .orderedAt(order.getOrderedAt())
+                .zipCode(order.getZipCode())
+                .address(order.getAddress())
+                .items(itemMailSendRequests)
+                .totalPrice(order.getTotalPrice())
+                .build();
+
+        // 주문 내역 메일 전송
+        mailService.sendReceiptMail(receiptMailSendRequest);
+
+        return order.getId();
     }
 
     private boolean isEqualPrice(Integer clientPrice, int servicePrice) {
