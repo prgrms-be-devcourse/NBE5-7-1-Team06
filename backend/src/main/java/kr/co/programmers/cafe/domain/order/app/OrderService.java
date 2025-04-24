@@ -135,16 +135,14 @@ public class OrderService {
                         .orderId(order.getId())
                         .email(order.getEmail())
                         .address(order.getAddress())
-                        .zipCode(order.getZipCode())
                         .totalPrice(order.getTotalPrice())
                         .status(order.getStatus())
                         .orderItems(order.getOrderItems().stream()
                                 .map(orderItem -> OrderItemResponse.builder()
                                         .name(orderItem.getItem().getName())
-                                        .price(orderItem.getItem().getPrice())
                                         .quantity(orderItem.getQuantity())
                                         .build())
-                                .collect(Collectors.toList()))
+                                .toList())
                         .build());
     }
 

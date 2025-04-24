@@ -72,7 +72,7 @@ public class AdminController {
     }
 
     @GetMapping("/orders")
-    public String getOrders(@RequestParam(required = false) Long orderId,
+    public String orderList(@RequestParam(required = false) Long orderId,
                             @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                             Model model) {
         Page<OrderResponse> orders;
@@ -98,7 +98,7 @@ public class AdminController {
 
     // 주문 상세 조회 페이지
     @GetMapping("/order/{orderId}")
-    public String orderSearch(@PathVariable Long orderId, Model model) {
+    public String orderDetail(@PathVariable Long orderId, Model model) {
         OrderResponse order = orderService.getOrderById(orderId);
         model.addAttribute("order", order);
         return "orders/order-detail";
