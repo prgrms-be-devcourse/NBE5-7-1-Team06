@@ -28,6 +28,10 @@ spring:
       password: example
       roles: ADMIN
 
+custom:
+  mail:
+    subject: IPv6 커피 구매 내역
+
 ---
 # dev profile
 spring:
