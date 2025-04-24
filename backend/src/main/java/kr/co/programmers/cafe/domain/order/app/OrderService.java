@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -110,6 +111,27 @@ public class OrderService {
         Page<Order> ordersPage = orderRepository.findAll(pageable);
 
         return ordersPage.map(order -> OrderResponse.builder()
+                .orderId(order.getId())
+                .email(order.getEmail())
+                .address(order.getAddress())
+                .zipCode(order.getZipCode())
+                .totalPrice(order.getTotalPrice())
+                .status(order.getStatus())
+                .orderItems(order.getOrderItems().stream()
+                        .map(orderItem -> OrderItemResponse.builder()
+                                .name(orderItem.getItem().getName())
+                                .price(orderItem.getItem().getPrice())
+                                .quantity(orderItem.getQuantity())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build());
+    }
+
+    // 목록 단건 조회용
+    @Transactional
+    public Optional<OrderResponse> searchOrder(Long orderId) {
+        return orderRepository.findById(orderId)
+                .map(order -> OrderResponse.builder()
                         .orderId(order.getId())
                         .email(order.getEmail())
                         .address(order.getAddress())
@@ -126,31 +148,6 @@ public class OrderService {
                         .build());
     }
 
-    // 목록 단건 조회용
-    @Transactional
-    public Page<OrderResponse> searchOrders(Long orderId, Pageable pageable) {
-        return orderRepository.findById(orderId)
-                .map(order -> {
-                    OrderResponse response = OrderResponse.builder()
-                            .orderId(order.getId())
-                            .email(order.getEmail())
-                            .address(order.getAddress())
-                            .zipCode(order.getZipCode())
-                            .totalPrice(order.getTotalPrice())
-                            .status(order.getStatus())
-                            .orderItems(order.getOrderItems().stream()
-                                    .map(orderItem -> OrderItemResponse.builder()
-                                            .name(orderItem.getItem().getName())
-                                            .price(orderItem.getItem().getPrice())
-                                            .quantity(orderItem.getQuantity())
-                                            .build())
-                                    .collect(Collectors.toList()))
-                            .build();
-                    return new PageImpl<>(List.of(response), pageable, 1); // 단일 결과를 페이지로 감싸기
-                })
-                .orElseGet(() -> new PageImpl<>(List.of(), pageable, 0)); // 없으면 빈 페이지
-    }
-
     @Transactional
     public void changeOrderStatus(Long orderId, Status status) {
         Order order = orderRepository.findById(orderId)
@@ -160,3 +157,4 @@ public class OrderService {
 
 
 }
+

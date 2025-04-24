@@ -6,6 +6,7 @@ import kr.co.programmers.cafe.domain.order.dto.OrderStatusChangeRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import kr.co.programmers.cafe.domain.order.entity.Status;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -75,10 +77,13 @@ public class AdminController {
                             Model model) {
         Page<OrderResponse> orders;
 
-        if (orderId != null && orderId > 0) {
-            orders = orderService.searchOrders(orderId, pageable);
-            if (orders.isEmpty()) {
+        if (orderId != null) {
+            Optional<OrderResponse> optionalOrder = orderService.searchOrder(orderId);
+            if (optionalOrder.isEmpty()) {
                 model.addAttribute("message", "해당 주문 번호가 존재하지 않습니다.");
+                orders = Page.empty(); // orders 초기화
+            } else {
+                orders = new PageImpl<>(List.of(optionalOrder.get()), pageable, 1);
             }
         } else {
             orders = orderService.getAllOrders(pageable);
@@ -86,10 +91,10 @@ public class AdminController {
                 model.addAttribute("message", "주문이 없습니다.");
             }
         }
-
         model.addAttribute("orders", orders);
         return "orders/order-list";
     }
+
 
     // 주문 상세 조회 페이지
     @GetMapping("/order/{orderId}")
@@ -111,3 +116,4 @@ public class AdminController {
     }
 
 }
+
