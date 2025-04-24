@@ -2,10 +2,10 @@ package kr.co.programmers.cafe.domain.order.app;
 
 
 import jakarta.transaction.Transactional;
-import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
+import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
+import kr.co.programmers.cafe.domain.item.entity.Item;
 import kr.co.programmers.cafe.domain.order.dao.OrderRepository;
 import kr.co.programmers.cafe.domain.order.dto.OrderRequest;
-import kr.co.programmers.cafe.domain.order.entity.Item;
 import kr.co.programmers.cafe.domain.order.entity.Order;
 import kr.co.programmers.cafe.domain.order.entity.OrderItem;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
@@ -24,6 +24,7 @@ public class OrderService {
     /**
      * 주문을 생성하고 생성된 주문의 ID를 반환합니다.
      * 사용자 예외 처리로 수정 예정
+     *
      * @param request 사용자로부터 받은 주문 요청
      * @return 생성된 주문의 ID
      */

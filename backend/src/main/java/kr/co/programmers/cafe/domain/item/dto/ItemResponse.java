@@ -1,7 +1,7 @@
 package kr.co.programmers.cafe.domain.item.dto;
 
-import kr.co.programmers.cafe.domain.order.entity.Category;
-import kr.co.programmers.cafe.domain.order.entity.Item;
+import kr.co.programmers.cafe.domain.item.entity.Category;
+import kr.co.programmers.cafe.domain.item.entity.Item;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,11 +1,11 @@
 package kr.co.programmers.cafe.domain.item.app;
 
+import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
 import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
 import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
-import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
-import kr.co.programmers.cafe.domain.order.entity.Category;
-import kr.co.programmers.cafe.domain.order.entity.Item;
+import kr.co.programmers.cafe.domain.item.entity.Category;
+import kr.co.programmers.cafe.domain.item.entity.Item;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import kr.co.programmers.cafe.global.util.FileManager;
 import org.junit.jupiter.api.BeforeEach;

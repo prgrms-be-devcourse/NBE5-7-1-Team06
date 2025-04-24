@@ -1,4 +1,4 @@
-package kr.co.programmers.cafe.domain.order.entity;
+package kr.co.programmers.cafe.domain.item.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

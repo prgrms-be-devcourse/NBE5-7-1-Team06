@@ -2,7 +2,7 @@ package kr.co.programmers.cafe.domain.item.api;
 
 import kr.co.programmers.cafe.domain.item.app.ItemService;
 import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
-import kr.co.programmers.cafe.domain.order.entity.Category;
+import kr.co.programmers.cafe.domain.item.entity.Category;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

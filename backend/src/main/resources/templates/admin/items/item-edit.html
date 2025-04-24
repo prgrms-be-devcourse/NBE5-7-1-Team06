@@ -41,7 +41,7 @@
 
     <div class="form-field image-container" style="text-align: center;">
         <div class="form-field image-container" style="text-align: center;"
-             th:if="${item?.id != null && item?.image != null}">
+             th:if="${item != null && item.image != null}" th:onerror="this.style.display='none'">
         </div>
 
     <div class="button-container">
