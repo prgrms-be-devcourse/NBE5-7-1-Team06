@@ -1,16 +1,35 @@
 import React, { useState } from "react";
 import api from "../api/axios";
+
 import "./CartSideBar.css";
+import PostCodeModal from "./PostCodeModal";
 
 export default function CartSideBar({ cartItems, onUpdateQuantity, onClose }) {
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
+    const [addressDetail, setAddressDetail] = useState("");
     const [zipcode, setZipcode] = useState("");
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
   
     const handleCheckout = async () => {
+      if(!cartItems || cartItems.length === 0) {
+        alert("구매할 상품을 선택해주세요.")
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        alert("올바른 이메일 주소를 입력해주세요.");
+        return;
+      }
+
+      if (!zipcode || !address || !addressDetail) {
+        alert("우편번호, 주소, 상세주소를 모두 입력해주세요.");
+        return;
+      }
+
       const orderData = {
         email,
-        address,
+        address: address + " " + addressDetail,
         zipCode: zipcode,
         orderItemRequests: cartItems.map(item => ({
           itemId: item.id,
@@ -26,6 +45,12 @@ export default function CartSideBar({ cartItems, onUpdateQuantity, onClose }) {
         console.error("주문 실패:", error);
         alert("주문 처리 중 오류가 발생했습니다.");
       }
+    };
+
+    // 이메일 유효성 체크
+    const isValidEmail = (email) => {
+      const regex = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/;
+      return regex.test(email);
     };
   
     // 총 금액 계산
@@ -79,16 +104,34 @@ export default function CartSideBar({ cartItems, onUpdateQuantity, onClose }) {
           />
           <input
             type="text"
-            placeholder="주소 입력"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            placeholder="우편번호 입력"
+            value={zipcode}
+            onClick={() => setIsPopupOpen(true)}
+            readOnly
           />
           <input
             type="text"
-            placeholder="우편번호 입력"
-            value={zipcode}
-            onChange={(e) => setZipcode(e.target.value)}
+            placeholder="주소 입력"
+            value={address}
+            onClick={() => setIsPopupOpen(true)}
+            readOnly
           />
+          <input
+            type="text"
+            placeholder="상세 주소 입력"
+            value={addressDetail}
+            onChange={(e) => setAddressDetail(e.target.value)}
+          />
+          {isPopupOpen && (
+            <PostCodeModal
+              onClose={() => setIsPopupOpen(false)}
+              onComplete={(data) => {
+                setAddress(data.address);
+                setZipcode(data.zonecode);
+                setIsPopupOpen(false);
+              }}
+            />
+          )}
         </div>
   
         <button className="checkout-button" onClick={handleCheckout}>

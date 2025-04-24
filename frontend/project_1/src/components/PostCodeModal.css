@@ -12,7 +12,8 @@
   background: white;
   padding: 48px 24px 32px;
   border-radius: 24px;
-  width: 340px;
+  width: 500px;
+  height: 460px;
   position: relative;
   text-align: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -30,45 +31,8 @@
   cursor: pointer;
   transition: color 0.2s ease;
 }
-
 .close-button:hover {
   color: #3e2b1f;
-}
-
-.modal-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.modal-name {
-  font-size: 22px;
-  font-weight: 700;
-  color: #5c3f2e;
-  margin-bottom: 8px;
-}
-
-.modal-price {
-  font-size: 16px;
-  font-weight: 600;
-  color: #6f4e37;
-  margin-bottom: 24px;
-}
-
-/* 장바구니 추가 버튼 */
-.modal-add-button {
-  padding: 12px 28px;
-  background-color: #6f4e37;
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .modal-add-button:hover {
