@@ -10,6 +10,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import kr.co.programmers.cafe.domain.order.entity.Status;
+
+
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -41,20 +45,30 @@ public class AdminController {
         return "admin/manage-form";
     }
 
-    //관리자 - 주문 조회 메서드
+    @GetMapping("/orders")
+    public String orderList(Model model) {
+        List<OrderResponse> allOrders = orderService.getAllOrders();
+        model.addAttribute("orders", allOrders);
+        return "admin/orders";
+    }
+
+    // 주문 상세 조회 페이지
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.getOrderById(orderId));
+    public String orderSearch(@PathVariable Long orderId, Model model) {
+        OrderResponse order = orderService.getOrderById(orderId);
+        model.addAttribute("order", order);
+        return "admin/order-search";
     }
 
     //관리자 - 주문 상태 변환 메서드
-    @PutMapping("/order/{orderId}/status")
-    public ResponseEntity<Void> changeOrderStatus(
+    //PUT이 안되기 때문에 POST로
+    @PostMapping("/order/{orderId}/status")
+    public String changeOrderStatus(
             @PathVariable Long orderId,
-            @RequestBody OrderStatusChangeRequest request
+            @RequestParam("status") Status status
     ) {
-        orderService.changeOrderStatus(orderId, request.getStatus());
-        return ResponseEntity.ok().build();
+        orderService.changeOrderStatus(orderId, status);
+        return "redirect:/admin/orders";
     }
 
 }

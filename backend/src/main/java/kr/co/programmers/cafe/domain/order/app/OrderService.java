@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,10 +101,37 @@ public class OrderService {
                 .build();
     }
 
+
+
+    @Transactional
+    public List<OrderResponse> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+
+        return orders.stream()
+                .map(order -> OrderResponse.builder()
+                        .orderId(order.getId())
+                        .email(order.getEmail())
+                        .address(order.getAddress())
+                        .zipCode(order.getZipCode())
+                        .totalPrice(order.getTotalPrice())
+                        .status(order.getStatus())
+                        .orderItems(order.getOrderItems().stream()
+                                .map(orderItem -> OrderItemResponse.builder()
+                                        .name(orderItem.getItem().getName())
+                                        .price(orderItem.getItem().getPrice())
+                                        .quantity(orderItem.getQuantity())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void changeOrderStatus(Long orderId, Status status) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
         order.changeStatus(status);
     }
+
+
 }
