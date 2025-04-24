@@ -13,6 +13,9 @@ import kr.co.programmers.cafe.domain.order.entity.OrderItem;
 import kr.co.programmers.cafe.domain.order.entity.Status;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -97,18 +100,16 @@ public class OrderService {
                 .zipCode(order.getZipCode())
                 .orderItems(orderItemResponses)
                 .totalPrice(order.getTotalPrice())
+                .orderedAt(order.getOrderedAt())
                 .status(order.getStatus())
                 .build();
     }
 
-
-
     @Transactional
-    public List<OrderResponse> getAllOrders() {
-        List<Order> orders = orderRepository.findAll();
+    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+        Page<Order> ordersPage = orderRepository.findAll(pageable);
 
-        return orders.stream()
-                .map(order -> OrderResponse.builder()
+        return ordersPage.map(order -> OrderResponse.builder()
                         .orderId(order.getId())
                         .email(order.getEmail())
                         .address(order.getAddress())
@@ -122,8 +123,32 @@ public class OrderService {
                                         .quantity(orderItem.getQuantity())
                                         .build())
                                 .collect(Collectors.toList()))
-                        .build())
-                .collect(Collectors.toList());
+                        .build());
+    }
+
+    // 목록 단건 조회용
+    @Transactional
+    public Page<OrderResponse> searchOrders(Long orderId, Pageable pageable) {
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    OrderResponse response = OrderResponse.builder()
+                            .orderId(order.getId())
+                            .email(order.getEmail())
+                            .address(order.getAddress())
+                            .zipCode(order.getZipCode())
+                            .totalPrice(order.getTotalPrice())
+                            .status(order.getStatus())
+                            .orderItems(order.getOrderItems().stream()
+                                    .map(orderItem -> OrderItemResponse.builder()
+                                            .name(orderItem.getItem().getName())
+                                            .price(orderItem.getItem().getPrice())
+                                            .quantity(orderItem.getQuantity())
+                                            .build())
+                                    .collect(Collectors.toList()))
+                            .build();
+                    return new PageImpl<>(List.of(response), pageable, 1); // 단일 결과를 페이지로 감싸기
+                })
+                .orElseGet(() -> new PageImpl<>(List.of(), pageable, 0)); // 없으면 빈 페이지
     }
 
     @Transactional
