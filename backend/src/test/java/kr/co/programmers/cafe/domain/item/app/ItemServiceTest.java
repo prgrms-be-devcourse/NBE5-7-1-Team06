@@ -1,5 +1,8 @@
-package kr.co.programmers.cafe.domain.item;
+package kr.co.programmers.cafe.domain.item.app;
 
+import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
 import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.order.entity.Category;
 import kr.co.programmers.cafe.domain.order.entity.Item;
@@ -145,7 +148,7 @@ class ItemServiceTest {
         assertThat(response.getName()).isEqualTo(editForm.getName());
         assertThat(response.getPrice()).isEqualTo(editForm.getPrice());
         assertThat(response.getCategory()).isEqualTo(Category.valueOf(editForm.getCategory()));
-        assertThat(response.getImageUrl()).isEqualTo("new-image.jpg");
+        assertThat(response.getImageName()).isEqualTo("new-image.jpg");
         verify(fileManager).deleteFile(any());
         verify(fileManager).saveFile(any());
     }

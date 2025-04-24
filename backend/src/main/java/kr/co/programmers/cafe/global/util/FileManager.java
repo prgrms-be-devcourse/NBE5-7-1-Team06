@@ -2,9 +2,8 @@ package kr.co.programmers.cafe.global.util;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,24 +52,43 @@ public class FileManager {
     }
 
     //해당 이미지 파일을 삭제합니다.
-    public void deleteFile(String filePath){
-        if(filePath == null){
+    public void deleteFile(String filePath) {
+        if (filePath == null) {
             return;
         }
         File file = Path.of(getFullPath(filePath)).toFile();
-        if(file.exists()){
+        if (file.exists()) {
             file.delete();
         }
     }
 
-    public byte[] getFile(String filePath){
+    public byte[] getFile(String filePath) {
+        if (filePath == null) {
+            return null;
+        }
         String fullPath = getFullPath(filePath);
         File file = new File(fullPath);
+        if (!file.exists()) {
+            return null;
+        }
+
         try {
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
             throw new RuntimeException("Failed to read file", e);
         }
     }
-        
+
+    public Resource getFileResource(String filePath) {
+        if (filePath == null) {
+            return null;
+        }
+        String fullPath = getFullPath(filePath);
+        Resource resource = new FileSystemResource(Path.of(fullPath));
+        if (!resource.exists()) {
+            return null;
+        }
+        return resource;
+    }
+
 }

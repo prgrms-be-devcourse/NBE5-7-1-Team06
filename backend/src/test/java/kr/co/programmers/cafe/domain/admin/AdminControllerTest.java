@@ -1,9 +1,9 @@
 package kr.co.programmers.cafe.domain.admin;
 
-import kr.co.programmers.cafe.domain.item.ItemCreateForm;
-import kr.co.programmers.cafe.domain.item.ItemEditForm;
-import kr.co.programmers.cafe.domain.item.ItemResponse;
-import kr.co.programmers.cafe.domain.item.ItemService;
+import kr.co.programmers.cafe.domain.item.app.ItemService;
+import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
 import kr.co.programmers.cafe.domain.order.entity.Category;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import kr.co.programmers.cafe.global.util.FileManager;
@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(AdminController.class)
+@WithMockUser(roles = "ADMIN")
 class AdminControllerTest {
 
     @Autowired
@@ -55,7 +56,6 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void getItemForm_Success() throws Exception {
         mockMvc.perform(get("/admin/items/new"))
                 .andExpect(status().isOk())
@@ -63,7 +63,6 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void getEditForm_Success() throws Exception {
         given(itemService.findById(1L)).willReturn(testItem);
 
@@ -73,7 +72,6 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void getItems_Success() throws Exception {
         List<ItemResponse> items = List.of(testItem);
         Page<ItemResponse> page = new PageImpl<>(items);
@@ -85,7 +83,6 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void createItem_Success() throws Exception {
         MockMultipartFile imageFile = new MockMultipartFile(
                 "image",
@@ -107,7 +104,6 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void updateItem_Success() throws Exception {
         MockMultipartFile imageFile = new MockMultipartFile(
                 "image",
@@ -136,7 +132,6 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void getEditForm_WithInvalidId_ShouldReturn404() throws Exception {
         given(itemService.findById(999L)).willThrow(new ItemNotFoundException(999L));
 
@@ -145,7 +140,6 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void deleteItem_WithoutCsrf_ShouldReturn403() throws Exception {
         mockMvc.perform(multipart("/admin/items/1")
                         .with(request -> {
@@ -156,7 +150,6 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void updateItem_WithInvalidId_ShouldReturn404() throws Exception {
         MockMultipartFile imageFile = new MockMultipartFile(
                 "image",

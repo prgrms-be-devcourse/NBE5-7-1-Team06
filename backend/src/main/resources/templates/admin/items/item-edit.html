@@ -40,10 +40,9 @@
     </div>
 
     <div class="form-field image-container" style="text-align: center;">
-        <img th:if="${itemEditForm.imageUrl != null}"
-             th:src="@{'/admin/display-image/' + ${itemEditForm.imageUrl}}" alt="상품 이미지"
-             style="max-width: 300px; height: auto;">
-    </div>
+        <div class="form-field image-container" style="text-align: center;"
+             th:if="${item?.id != null && item?.image != null}">
+        </div>
 
     <div class="button-container">
         <button type="submit" class="btn btn-save">저장</button>

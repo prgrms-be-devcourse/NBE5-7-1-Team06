@@ -1,17 +1,13 @@
 package kr.co.programmers.cafe.domain.admin;
 
-import kr.co.programmers.cafe.domain.item.ItemCreateForm;
-import kr.co.programmers.cafe.domain.item.ItemEditForm;
-import kr.co.programmers.cafe.domain.item.ItemResponse;
-import kr.co.programmers.cafe.domain.item.ItemService;
+import kr.co.programmers.cafe.domain.item.app.ItemService;
+import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
 import kr.co.programmers.cafe.global.util.FileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,8 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.io.IOException;
 
 @Slf4j
 @Controller
@@ -79,16 +73,6 @@ public class AdminController {
         return "redirect:/admin/items";
     }
 
-    @GetMapping("/display-image/{fileName}")
-    public ResponseEntity<byte[]> displayImage(@PathVariable String fileName) throws IOException {
-        byte[] imageBytes = fileManager.getFile(fileName);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG); // 또는 적절한 미디어 타입
-
-        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-    }
-
     @GetMapping("/items/edit/{itemId}")
     public String editItemForm(@PathVariable Long itemId, ItemEditForm itemEditForm) {
         ItemResponse itemResponse = itemService.findById(itemId);
@@ -96,7 +80,7 @@ public class AdminController {
         itemEditForm.setName(itemResponse.getName());
         itemEditForm.setPrice(itemResponse.getPrice());
         itemEditForm.setCategory(itemResponse.getCategory().name());
-        itemEditForm.setImageUrl(itemResponse.getImageUrl());
+        itemEditForm.setImageUrl(itemResponse.getImageName());
         return "admin/items/item-edit";
     }
 

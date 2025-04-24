@@ -1,6 +1,9 @@
-package kr.co.programmers.cafe.domain.item;
+package kr.co.programmers.cafe.domain.item.app;
 
 import jakarta.transaction.Transactional;
+import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
+import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
 import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.order.entity.Category;
 import kr.co.programmers.cafe.domain.order.entity.Item;
@@ -8,6 +11,7 @@ import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import kr.co.programmers.cafe.global.util.FileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -72,7 +76,7 @@ public class ItemService {
         return itemRepository.findAll(pageable)
                 .map(ItemResponse::of);
     }
-    
+
 
     public ItemResponse findById(Long id) throws ItemNotFoundException {
         return ItemResponse.of(itemRepository.findById(id).orElseThrow(
@@ -106,5 +110,10 @@ public class ItemService {
         return ItemResponse.of(itemRepository.save(item));
     }
 
+    public Resource getImage(Long itemId) {
+        String filePath = findById(itemId).getImageName();
+        Resource imageResource = fileManager.getFileResource(filePath);
+        return imageResource;
+    }
 
 }

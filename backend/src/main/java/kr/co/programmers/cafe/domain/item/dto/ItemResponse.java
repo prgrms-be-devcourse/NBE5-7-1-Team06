@@ -1,4 +1,4 @@
-package kr.co.programmers.cafe.domain.item;
+package kr.co.programmers.cafe.domain.item.dto;
 
 import kr.co.programmers.cafe.domain.order.entity.Category;
 import kr.co.programmers.cafe.domain.order.entity.Item;
@@ -20,7 +20,7 @@ public class ItemResponse implements Serializable {
     private final String name;
     private final Integer price;
     private final Category category;
-    private final String imageUrl;
+    private final String imageName;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
@@ -30,7 +30,7 @@ public class ItemResponse implements Serializable {
                 .name(item.getName())
                 .price(item.getPrice())
                 .category(item.getCategory())
-                .imageUrl(item.getImage())
+                .imageName(item.getImage())
                 .createdAt(item.getCreatedAt())
                 .updatedAt(item.getUpdatedAt())
                 .build();

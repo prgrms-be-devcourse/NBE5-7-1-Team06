@@ -1,4 +1,4 @@
-package kr.co.programmers.cafe.domain.item;
+package kr.co.programmers.cafe.domain.item.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -6,12 +6,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
-public class ItemEditForm {
-    private Long id;
+public class ItemCreateForm {
     private String name;
     private String category;
     private int price;
     private MultipartFile image;
-    private String imageUrl;
 
 }
