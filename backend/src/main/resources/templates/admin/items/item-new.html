@@ -19,8 +19,9 @@
     <div class="form-field">
         <label for="category" class="form-label">카테고리:</label>
         <select id="category" name="category" required class="form-input">
-            <option value="Coffee" th:selected="${itemCreateForm?.category == 'Coffee'}">커피</option>
-            <option value="NonCoffee" th:selected="${itemCreateForm?.category == 'NonCoffee'}">음료</option>
+            <option value="A" th:selected="${itemCreateForm?.category == 'A'}">A</option>
+            <option value="B" th:selected="${itemCreateForm?.category == 'B'}">B</option>
+            <option value="C" th:selected="${itemCreateForm?.category == 'C'}">C</option>
         </select>
     </div>
 

@@ -27,9 +27,8 @@ public class ItemService {
      *
      * @param itemCreateForm
      * @return 생성된 Item의 id값
-     * @throws IOException 이미지 파일 저장중 예외 발생시
      */
-    public Long create(ItemCreateForm itemCreateForm) throws IOException {
+    public Long create(ItemCreateForm itemCreateForm) {
         String filePath = fileManager.saveFile(itemCreateForm.getImage());
         Item item = Item.builder()
                 .name(itemCreateForm.getName())

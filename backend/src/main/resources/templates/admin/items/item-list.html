@@ -39,7 +39,7 @@
     <tbody>
     <tr th:each="item : ${items}">
         <td class="image-cell">
-            <img class="item-image" th:src="@{'/images/' + ${item.imageUrl}}" alt="상품 이미지">
+            <img class="item-image" th:if="${item.imageUrl != null}" th:src="@{'/admin/display-image/' + ${item.imageUrl}}" alt="상품 이미지">
         </td>
         <td class="name-cell">
             <span th:text="${item.name}"></span>

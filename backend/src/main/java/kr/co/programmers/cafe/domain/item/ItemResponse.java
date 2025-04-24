@@ -20,7 +20,7 @@ public class ItemResponse implements Serializable {
     private final String name;
     private final Integer price;
     private final Category category;
-    private final String image;
+    private final String imageUrl;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
@@ -30,7 +30,7 @@ public class ItemResponse implements Serializable {
                 .name(item.getName())
                 .price(item.getPrice())
                 .category(item.getCategory())
-                .image(item.getImage())
+                .imageUrl(item.getImage())
                 .createdAt(item.getCreatedAt())
                 .updatedAt(item.getUpdatedAt())
                 .build();

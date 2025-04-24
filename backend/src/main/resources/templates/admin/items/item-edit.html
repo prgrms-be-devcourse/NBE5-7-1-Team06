@@ -11,6 +11,7 @@
 <form th:action="@{'/admin/items/edit/' + ${itemEditForm.id}}" method="post" enctype="multipart/form-data" class="form-container"
       th:object="${itemEditForm}">
     <input type="hidden" name="_method" value="patch"/>
+    <intpu type="hidden" name="id" th:value="${itemEditForm.id}"/>
     <div class="form-field">
         <label for="name" class="form-label">상품명:</label>
         <input type="text" id="name" name="name" required class="form-input"
@@ -20,8 +21,9 @@
     <div class="form-field">
         <label for="category" class="form-label">카테고리:</label>
         <select id="category" name="category" required class="form-input">
-            <option value="Coffee" th:selected="${itemEditForm?.category == 'Coffee'}">커피</option>
-            <option value="NonCoffee" th:selected="${itemEditForm?.category == 'NonCoffee'}">음료</option>
+            <option value="A" th:selected="${itemEditForm?.category == 'A'}">A</option>
+            <option value="B" th:selected="${itemEditForm?.category == 'B'}">B</option>
+            <option value="C" th:selected="${itemEditForm?.category == 'C'}">C</option>
         </select>
     </div>
 
@@ -37,7 +39,7 @@
     </div>
 
     <div class="form-field image-container" style="text-align: center;">
-        <img th:src="@{'/images/' + ${itemEditForm.imageUrl}}" alt="상품 이미지" style="max-width: 300px; height: auto;">
+        <img th:if="${itemEditForm.imageUrl != null}" th:src="@{'/admin/display-image/' + ${itemEditForm.imageUrl}}" alt="상품 이미지" style="max-width: 300px; height: auto;">
     </div>
 
     <div class="button-container">
