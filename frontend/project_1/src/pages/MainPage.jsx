@@ -94,8 +94,8 @@ export default function MainPage() {
         {filteredItems.map(item => (
           <div key={item.id} className="menu-card" onClick={() => setSelectedItem(item)}>
             <img 
-                //src={`http://localhost:8080/api/items/${item.id}/images`} 
-                src={`http://localhost:3000/images/item-${item.id}.jpg`}
+                src={`http://localhost:8080/api/items/${item.id}/images`} 
+                //src={`http://localhost:3000/images/item-${item.id}.jpg`}
                 alt={item.name} 
                 onError={(e) => { e.target.src = "/images/coffee1.jpg"; }}/>
             <div className="menu-name">{item.name}</div>

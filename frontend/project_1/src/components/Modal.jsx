@@ -11,8 +11,8 @@ export default function Modal({ item, onClose, onAddToCart }) {
         <button className="close-button" onClick={onClose}>×</button>
 
         <img 
-          //src={`http://localhost:8080/api/items/${item.id}/images`} 
-          src={`http://localhost:3000/images/item-${item.id}.jpg`}
+          src={`http://localhost:8080/api/items/${item.id}/images`} 
+          //src={`http://localhost:3000/images/item-${item.id}.jpg`}
           alt={item.name} 
           className="modal-image"   
         //아직 서버에서 값을 가져올 수 없기 때문에 대체 이미지 경로
