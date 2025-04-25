@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -176,4 +178,23 @@ class ItemServiceTest {
         verify(itemRepository).findAll(pageable);
     }
 
+    @Test
+    void getImage_Success() {
+        given(itemRepository.findById(1L)).willReturn(Optional.of(testItem));
+        given(fileManager.getFileResource(testItem.getImage())).willReturn(new ByteArrayResource("test image content".getBytes()));
+
+        Resource result = itemService.getImage(1L);
+
+        assertThat(result).isNotNull();
+        verify(itemRepository).findById(1L);
+        verify(fileManager).getFileResource(testItem.getImage());
+    }
+
+    @Test
+    void getImage_ItemNotFound() {
+        given(itemRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> itemService.getImage(1L))
+                .isInstanceOf(ItemNotFoundException.class);
+    }
 }
