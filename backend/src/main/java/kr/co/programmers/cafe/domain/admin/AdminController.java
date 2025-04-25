@@ -53,13 +53,6 @@ public class AdminController {
         return "admin/login-form";
     }
 
-    // 로그인 성공 테스트 용
-    @GetMapping("/manage")
-    public String adminManage() {
-        log.info("관리 페이지 호출 테스트 - 로그인 성공");
-        return "admin/manage-form";
-    }
-
     @GetMapping("/main")
     public String adminMain() {
         return "admin/main";
