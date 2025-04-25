@@ -4,7 +4,9 @@ package kr.co.programmers.cafe.domain.order.app;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import kr.co.programmers.cafe.domain.item.app.ItemService;
 import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
+import kr.co.programmers.cafe.domain.item.dto.ItemSimpleResponse;
 import kr.co.programmers.cafe.domain.item.entity.Category;
 import kr.co.programmers.cafe.domain.item.entity.Item;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,9 @@ class OrderServiceTest {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private ItemService itemService;
 
     @BeforeEach
     void setUp() {
@@ -96,6 +101,21 @@ class OrderServiceTest {
         assertThat(orderId).isNotEmpty();  // 주문 ID가 비어있지 않음을 확인
 
         log.info("createOrder로 생성된 주문 ID: {}", orderId);
+    }
+
+    @Test
+    @DisplayName("전체 아이템 조회 - findAllItems() 테스트")
+    void findAllItems_정상작동하면_모든아이템반환() {
+        log.info("Starting findAllItems 테스트...");
+
+        List<ItemSimpleResponse> result = itemService.findAllItems();
+
+        // 검증
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getName()).isEqualTo("Americano");
+        assertThat(result.get(1).getImageName()).isEqualTo("img2.png");
+
+        log.info("조회된 아이템 목록: {}", result);
     }
 
 }
