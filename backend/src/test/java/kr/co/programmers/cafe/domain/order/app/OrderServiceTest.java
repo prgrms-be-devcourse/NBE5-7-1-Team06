@@ -43,7 +43,7 @@ class OrderServiceTest {
     private ItemRepository itemRepository;
 
     @Autowired
-    private ItemService itemService;
+    private OrderService orderService;
 
     @BeforeEach
     void setUp() {
