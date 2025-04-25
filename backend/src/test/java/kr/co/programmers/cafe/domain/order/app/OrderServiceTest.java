@@ -107,7 +107,6 @@ class OrderServiceTest {
         log.info("createOrder로 생성된 주문 ID: {}", orderId);
     }
 
-
     @Test
     @DisplayName("전체 주문 조회 테스트")
     void getAllOrdersTest() {
@@ -174,5 +173,6 @@ class OrderServiceTest {
         OrderResponse updatedOrder = orderService.getOrderById(orderId);
         assertThat(updatedOrder.getStatus()).isEqualTo(Status.COMPLETED);
     }
+
 
 }
