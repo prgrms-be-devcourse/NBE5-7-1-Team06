@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -113,7 +114,7 @@ public class OrderService {
 
     @Transactional
     public OrderResponse getOrderById(Long orderId) {
-        Order order = orderRepository.searchById(orderId)
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("해당 주문을 찾을 수 없습니다. "));
 
         List<OrderItemResponse> orderItemResponses = order.getOrderItems().stream()
@@ -153,7 +154,9 @@ public class OrderService {
 
     @Transactional
     public Optional<OrderResponse> searchOrder(Long orderId) {
-        Optional<Order> optionalOrder = orderRepository.searchById(orderId);
+        Optional<Order> optionalOrder = Optional.ofNullable(orderRepository.findById(orderId).orElseThrow(
+                () -> new NoSuchElementException(" 해당 주문을 찾을 수 없습니다.")
+        ));
         return optionalOrder.map(
                 order -> OrderResponse.builder()
                         .orderId(order.getId())
