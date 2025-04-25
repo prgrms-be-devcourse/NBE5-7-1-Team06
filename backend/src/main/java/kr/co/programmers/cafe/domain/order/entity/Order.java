@@ -5,12 +5,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
@@ -31,8 +35,12 @@ public class Order {
     @Column(nullable = false)
     private String zipCode;
 
-    @Column(nullable = false)
-    private LocalDateTime orderedAt = LocalDateTime.now();
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime orderedAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.ORDERED;
@@ -50,8 +58,6 @@ public class Order {
         this.zipCode = zipCode;
         this.orderItems = orderItems;
         this.totalPrice = totalPrice;
-        this.orderedAt = LocalDateTime.now();
-        this.status = Status.ORDERED;
     }
 
     //상태 변경 메서드
