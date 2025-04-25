@@ -194,7 +194,7 @@ public class OrderService {
     @Scheduled(cron = "0 0 14 * * *", zone = "Asia/Seoul")
     @Transactional
     public void executeOrderDelivery() {
-        List<Order> foundOrders = orderRepository.findOrdersWithItemsByTimeAndStatus(
+        List<Order> foundOrders = orderRepository.findByOrderedAtGreaterThanEqualAndStatus(
                 LocalDateTime.now(), Status.ORDERED
         );
 
