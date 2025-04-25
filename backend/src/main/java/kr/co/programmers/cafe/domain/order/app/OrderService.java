@@ -2,12 +2,15 @@ package kr.co.programmers.cafe.domain.order.app;
 
 
 import jakarta.transaction.Transactional;
-import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
+import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
+import kr.co.programmers.cafe.domain.item.entity.Item;
+import kr.co.programmers.cafe.domain.mail.dto.ItemMailSendRequest;
+import kr.co.programmers.cafe.domain.mail.dto.ReceiptMailSendRequest;
+import kr.co.programmers.cafe.domain.mail.service.MailService;
 import kr.co.programmers.cafe.domain.order.dao.OrderRepository;
 import kr.co.programmers.cafe.domain.order.dto.OrderItemResponse;
 import kr.co.programmers.cafe.domain.order.dto.OrderRequest;
 import kr.co.programmers.cafe.domain.order.dto.OrderResponse;
-import kr.co.programmers.cafe.domain.order.entity.Item;
 import kr.co.programmers.cafe.domain.order.entity.Order;
 import kr.co.programmers.cafe.domain.order.entity.OrderItem;
 import kr.co.programmers.cafe.domain.order.entity.Status;
@@ -18,9 +21,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,15 +33,20 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
+    private final MailService mailService;
 
     /**
      * 주문을 생성하고 생성된 주문의 ID를 반환합니다.
      * 사용자 예외 처리로 수정 예정
+     *
      * @param request 사용자로부터 받은 주문 요청
      * @return 생성된 주문의 ID
      */
     @Transactional
     public Long createOrder(OrderRequest request) {
+
+        // 주문 내역 상품 DTO 목록
+        List<ItemMailSendRequest> itemMailSendRequests = new ArrayList<>();
 
         // 사용자로부터 받은 주문 요청에서 주문 아이템 목록을 추출하여 OrderItem 객체 리스트로 변환
         List<OrderItem> orderItemList = request.getOrderItemRequests().stream().map(itemRequest -> {
@@ -47,6 +54,13 @@ public class OrderService {
             Item findItem = itemRepository.findById(itemRequest.getItemId()).orElseThrow(
                     () -> new ItemNotFoundException(itemRequest.getItemId()) // 아이템을 찾을 수 없으면 예외 발생
             );
+
+            itemMailSendRequests.add(ItemMailSendRequest.builder()
+                    .name(findItem.getName())
+                    .price(findItem.getPrice())
+                    .quantity(itemRequest.getQuantity())
+                    .build());
+
             return new OrderItem(findItem, itemRequest.getQuantity());
         }).toList();
 
@@ -73,8 +87,24 @@ public class OrderService {
         // 각 OrderItem 객체에 생성된 주문을 할당
         orderItemList.forEach(orderItem -> orderItem.assignOrder(order));
 
-        // 만든 주문을 DB에 저장하고, 생성된 주문의 ID를 반환
-        return orderRepository.save(order).getId();
+        // 만든 주문을 DB에 저장
+        orderRepository.save(order);
+
+        // 주문 내역 DTO
+        ReceiptMailSendRequest receiptMailSendRequest = ReceiptMailSendRequest.builder()
+                .orderId(order.getId())
+                .mailAddress(order.getEmail())
+                .orderedAt(order.getOrderedAt())
+                .zipCode(order.getZipCode())
+                .address(order.getAddress())
+                .items(itemMailSendRequests)
+                .totalPrice(order.getTotalPrice())
+                .build();
+
+        // 주문 내역 메일 전송
+        mailService.sendReceiptMail(receiptMailSendRequest);
+
+        return order.getId();
     }
 
     private boolean isEqualPrice(Integer clientPrice, int servicePrice) {
@@ -105,6 +135,7 @@ public class OrderService {
                 .status(order.getStatus())
                 .build();
     }
+
 
     @Transactional
     public Page<OrderResponse> getAllOrders(Pageable pageable) {

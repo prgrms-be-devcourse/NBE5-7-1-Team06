@@ -1,33 +1,38 @@
 package kr.co.programmers.cafe.domain.order.app;
 
-import kr.co.programmers.cafe.domain.order.dao.ItemRepository;
-import kr.co.programmers.cafe.domain.order.dto.OrderItemRequest;
-import kr.co.programmers.cafe.domain.order.dto.OrderItemResponse;
-import kr.co.programmers.cafe.domain.order.dto.OrderRequest;
-import kr.co.programmers.cafe.domain.order.dto.OrderResponse;
-import kr.co.programmers.cafe.domain.order.entity.Category;
-import kr.co.programmers.cafe.domain.order.entity.Item;
-import kr.co.programmers.cafe.domain.order.entity.Status;
+
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
+import kr.co.programmers.cafe.domain.item.entity.Category;
+import kr.co.programmers.cafe.domain.item.entity.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Slf4j
 class OrderServiceTest {
+
+    @RegisterExtension
+    private static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+            .withConfiguration(GreenMailConfiguration.aConfig().withUser("test", "test"))
+            .withPerMethodLifecycle(false);
 
     @Autowired
     private MockMvc mockMvc;
@@ -81,6 +86,10 @@ class OrderServiceTest {
                 )
                 .andExpect(status().isOk())  // 응답 상태 코드가 200 OK인지 확인
                 .andReturn();
+
+        // 샌드박스 메일 서버로 메일 수신 여부 확인
+        greenMail.waitForIncomingEmail(5000, 1);
+        assertThat(greenMail.getReceivedMessages().length).isEqualTo(1);
 
         // 생성된 주문 ID 확인
         String orderId = result.getResponse().getContentAsString();

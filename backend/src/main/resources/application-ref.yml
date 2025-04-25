@@ -20,6 +20,11 @@ spring:
 
   profiles:
     active: prod
+  #View 에서 요청 구분
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
 
   # 관리자 계정
   security:
@@ -27,6 +32,10 @@ spring:
       name: example
       password: example
       roles: ADMIN
+
+custom:
+  mail:
+    subject: IPv6 커피 구매 내역
 
 ---
 # dev profile
