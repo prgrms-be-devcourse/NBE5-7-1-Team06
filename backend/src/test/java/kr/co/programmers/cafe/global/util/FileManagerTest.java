@@ -4,9 +4,12 @@ import kr.co.programmers.cafe.global.exception.FileNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +17,11 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SpringBootTest
+@TestPropertySource(properties = "custom.file.path=${user.home}/devcourse/images")
 class FileManagerTest {
-    FileManager fileManager = new FileManager();
+    @Autowired
+    private FileManager fileManager;
     private MockMultipartFile mockFile;
     private String testFileName;
 
