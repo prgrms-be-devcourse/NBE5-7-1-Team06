@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -14,15 +15,25 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserDetails userDetails;
+    private final String username;
+    private final String password;
+    private final String roles;
+    private final PasswordEncoder encoder;
 
     // yml 파일 기반 인증 정보를 담은 UserDetails 생성
     public CustomUserDetailsService(@Value("${spring.security.user.name}") String username,
                                     @Value("${spring.security.user.password}") String password,
-                                    @Value("${spring.security.user.roles}") String roles) {
+                                    @Value("${spring.security.user.roles}") String roles,
+                                    PasswordEncoder encoder) {
         log.info("roles = {}", roles);
+
+        this.encoder = encoder;
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
         this.userDetails = User.builder()
                 .username(username)
-                .password(new BCryptPasswordEncoder().encode(password))
+                .password(this.encoder.encode(password))
                 .roles(roles)
                 .build();
     }
@@ -42,6 +53,11 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("권한이 부족합니다.");  // 로그인 실패 처리됨
         }
         log.info("Authorities = {}", userDetails.getAuthorities());
-        return userDetails;
+
+        return User.builder()
+                .username(this.username)
+                .password(encoder.encode(this.password))
+                .roles(this.roles)
+                .build();
     }
 }
