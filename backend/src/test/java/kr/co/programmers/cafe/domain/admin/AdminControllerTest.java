@@ -51,7 +51,7 @@ class AdminControllerTest {
                 .id(1L)
                 .name("아메리카노")
                 .price(4500)
-                .category(Category.A)
+                .category(Category.BEAN)
                 .build();
     }
 
@@ -98,7 +98,7 @@ class AdminControllerTest {
                         .file(imageFile)
                         .param("name", "아메리카노")
                         .param("price", "4500")
-                        .param("category", "A").with(csrf()))
+                        .param("category", "BEAN").with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/items"));
     }
@@ -119,7 +119,7 @@ class AdminControllerTest {
                 .param("id", "1")
                 .param("name", "라떼")
                 .param("price", "5000")
-                .param("category", "A").with(csrf());
+                .param("category", "BEAN").with(csrf());
 
         multipartRequest.with(request -> {
             request.setMethod("PATCH");
@@ -178,7 +178,7 @@ class AdminControllerTest {
                 .param("id", "1")
                 .param("name", "라떼")
                 .param("price", "5000")
-                .param("category", "A")
+                .param("category", "BEAN")
                 .with(csrf());
 
         multipartRequest.with(request -> {

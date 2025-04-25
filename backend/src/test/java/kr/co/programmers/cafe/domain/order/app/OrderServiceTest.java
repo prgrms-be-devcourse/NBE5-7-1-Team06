@@ -4,9 +4,7 @@ package kr.co.programmers.cafe.domain.order.app;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import kr.co.programmers.cafe.domain.item.app.ItemService;
 import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
-import kr.co.programmers.cafe.domain.item.dto.ItemSimpleResponse;
 import kr.co.programmers.cafe.domain.item.entity.Category;
 import kr.co.programmers.cafe.domain.item.entity.Item;
 import kr.co.programmers.cafe.domain.order.dto.OrderItemRequest;
@@ -21,6 +19,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -55,14 +55,16 @@ class OrderServiceTest {
         itemRepository.saveAll(List.of(
                 Item.builder()
                         .name("Americano")
+                        .decription("test")
                         .price(3000)
-                        .category(Category.A)
+                        .category(Category.BEAN)
                         .image("img1.png")
                         .build(),
                 Item.builder()
                         .name("Croissant")
+                        .decription("test2")
                         .price(2500)
-                        .category(Category.B)
+                        .category(Category.TEA)
                         .image("img2.png")
                         .build()
         ));
@@ -125,7 +127,7 @@ class OrderServiceTest {
         Long orderId2 = orderService.createOrder(request2);
 
         // when
-        List<OrderResponse> allOrders = orderService.getAllOrders();
+        Page<OrderResponse> allOrders = orderService.getAllOrders(PageRequest.of(0, 10));
 
         // then
         assertThat(allOrders).isEqualTo(2);

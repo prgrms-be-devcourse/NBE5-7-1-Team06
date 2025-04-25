@@ -58,8 +58,9 @@ class ItemServiceTest {
         testItem = Item.builder()
                 .id(1L)
                 .name("Americano")
+                .decription("test")
                 .price(4500)
-                .category(Category.A)
+                .category(Category.BEAN)
                 .image("test-image.jpg")
                 .build();
 
@@ -72,15 +73,17 @@ class ItemServiceTest {
 
         createForm = new ItemCreateForm();
         createForm.setName("Americano");
+        createForm.setDescription("test");
         createForm.setPrice(4500);
-        createForm.setCategory("A");
+        createForm.setCategory("BEAN");
         createForm.setImage(mockFile);
 
         editForm = new ItemEditForm();
         editForm.setId(1L);
-        editForm.setName("Latte");
+        editForm.setName("TEA");
+        editForm.setDescription("test2");
         editForm.setPrice(5000);
-        editForm.setCategory("B");
+        editForm.setCategory("TEA");
         editForm.setImage(mockFile);
     }
 
@@ -91,16 +94,18 @@ class ItemServiceTest {
         Item item1 = Item.builder()
                 .id(1L)
                 .name("Americano")
+                .decription("test1")
                 .price(4500)
-                .category(Category.A)
+                .category(Category.BEAN)
                 .image("americano.jpg")
                 .build();
 
         Item item2 = Item.builder()
                 .id(2L)
                 .name("Latte")
+                .decription("test2")
                 .price(5000)
-                .category(Category.B)
+                .category(Category.TEA)
                 .image("latte.jpg")
                 .build();
 
@@ -114,12 +119,12 @@ class ItemServiceTest {
 
         ItemSimpleResponse first = items.get(0);
         assertThat(first.getName()).isEqualTo("Americano");
-        assertThat(first.getCategory()).isEqualTo(Category.A);
+        assertThat(first.getCategory()).isEqualTo(Category.BEAN);
         assertThat(first.getImageName()).isEqualTo("americano.jpg");
 
         ItemSimpleResponse second = items.get(1);
         assertThat(second.getName()).isEqualTo("Latte");
-        assertThat(second.getCategory()).isEqualTo(Category.B);
+        assertThat(second.getCategory()).isEqualTo(Category.TEA);
         assertThat(second.getImageName()).isEqualTo("latte.jpg");
 
         log.info("조회된 아이템 리스트: {}", items);
