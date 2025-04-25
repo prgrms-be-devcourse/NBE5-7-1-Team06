@@ -55,14 +55,14 @@ class OrderServiceTest {
         itemRepository.saveAll(List.of(
                 Item.builder()
                         .name("Americano")
-                        .decription("test")
+                        .description("test")
                         .price(3000)
                         .category(Category.BEAN)
                         .image("img1.png")
                         .build(),
                 Item.builder()
                         .name("Croissant")
-                        .decription("test2")
+                        .description("test2")
                         .price(2500)
                         .category(Category.TEA)
                         .image("img2.png")
@@ -130,7 +130,7 @@ class OrderServiceTest {
         Page<OrderResponse> allOrders = orderService.getAllOrders(PageRequest.of(0, 10));
 
         // then
-        assertThat(allOrders).isEqualTo(2);
+        assertThat(allOrders.getTotalElements()).isEqualTo(2);
         assertThat(allOrders).extracting("orderId").contains(orderId1, orderId2);
         log.info(allOrders.toString());
 

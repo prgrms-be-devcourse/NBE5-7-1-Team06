@@ -45,9 +45,10 @@ public class Item {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Builder
-    public Item(Long id, String decription, String name, Integer price, Category category, String image) {
+    public Item(Long id, String description, String name, Integer price, Category category, String image) {
         this.id = id;
         this.name = name;
+        this.description = description;
         this.price = price;
         this.category = category;
         this.image = image;
