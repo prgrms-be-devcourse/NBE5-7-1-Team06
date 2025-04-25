@@ -5,6 +5,7 @@ import kr.co.programmers.cafe.global.exception.FileNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -72,6 +73,23 @@ public class FileManager {
             throw new FileNotFoundException(null);
         }
         return resource;
+    }
+
+    public MediaType getMediaType(String fileName) {
+        if (fileName != null) {
+            String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+            switch (extension) {
+                case "jpg":
+                case "jpeg":
+                    return MediaType.IMAGE_JPEG;
+                case "gif":
+                    return MediaType.IMAGE_GIF;
+                case "png":
+                default:
+                    return MediaType.IMAGE_PNG;
+            }
+        }
+        return null;
     }
 
 }

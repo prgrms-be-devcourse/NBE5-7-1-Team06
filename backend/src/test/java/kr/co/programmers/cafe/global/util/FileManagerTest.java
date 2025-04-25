@@ -76,4 +76,15 @@ class FileManagerTest {
         assertThat(savedFile.exists()).isFalse();
     }
 
+    @Test
+    void getMediaType_Success() {
+        assertThat(fileManager.getMediaType("test.png")).isEqualTo(MediaType.IMAGE_PNG);
+        assertThat(fileManager.getMediaType("test.jpg")).isEqualTo(MediaType.IMAGE_JPEG);
+        assertThat(fileManager.getMediaType("test.jpeg")).isEqualTo(MediaType.IMAGE_JPEG);
+        assertThat(fileManager.getMediaType("test.gif")).isEqualTo(MediaType.IMAGE_GIF);
+        assertThat(fileManager.getMediaType("test")).isEqualTo(MediaType.IMAGE_PNG);
+        assertThat(fileManager.getMediaType(null)).isEqualTo(null);
+
+    }
+
 }
