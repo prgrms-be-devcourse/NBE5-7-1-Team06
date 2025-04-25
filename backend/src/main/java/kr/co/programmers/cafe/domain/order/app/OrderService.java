@@ -178,7 +178,7 @@ public class OrderService {
 //    }
     @Transactional
     public Optional<OrderResponse> searchOrder(Long orderId) {
-        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        Optional<Order> optionalOrder = orderRepository.searchById(orderId);
         return optionalOrder.map(
                 order -> OrderResponse.builder()
                         .orderId(order.getId())
