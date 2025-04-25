@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>관리자 메인</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
     <style>
         body {
             display: flex;
@@ -11,10 +12,12 @@
             height: 100vh;
             font-family: sans-serif;
         }
+
         .button-container {
             display: flex;
             gap: 30px;
         }
+
         .admin-btn {
             padding: 20px 40px;
             font-size: 18px;
@@ -25,11 +28,14 @@
 <body>
 <div class="button-container">
     <a href="/admin/items">
-        <button class="admin-btn">상품 관리</button>
+        <button class="menu-button admin-btn">상품 관리</button>
     </a>
     <a href="/admin/orders">
-        <button class="admin-btn">주문 관리</button>
+        <button class="menu-button admin-btn">주문 관리</button>
     </a>
+    <form th:action="@{/admin/logout}" method="post" style="margin:0;">
+        <button type="submit" class="admin-btn">로그아웃</button>
+    </form>
 </div>
 </body>
 </html>

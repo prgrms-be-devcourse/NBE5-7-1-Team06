@@ -4,9 +4,7 @@ package kr.co.programmers.cafe.domain.order.app;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import kr.co.programmers.cafe.domain.item.app.ItemService;
 import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
-import kr.co.programmers.cafe.domain.item.dto.ItemSimpleResponse;
 import kr.co.programmers.cafe.domain.item.entity.Category;
 import kr.co.programmers.cafe.domain.item.entity.Item;
 import kr.co.programmers.cafe.domain.order.dto.OrderItemRequest;
@@ -21,10 +19,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -55,14 +56,16 @@ class OrderServiceTest {
         itemRepository.saveAll(List.of(
                 Item.builder()
                         .name("Americano")
+                        .description("test")
                         .price(3000)
-                        .category(Category.A)
+                        .category(Category.BEAN)
                         .image("img1.png")
                         .build(),
                 Item.builder()
                         .name("Croissant")
+                        .description("test2")
                         .price(2500)
-                        .category(Category.B)
+                        .category(Category.TEA)
                         .image("img2.png")
                         .build()
         ));
@@ -124,12 +127,17 @@ class OrderServiceTest {
         Long orderId1 = orderService.createOrder(request1);
         Long orderId2 = orderService.createOrder(request2);
 
+        PageRequest pageable = PageRequest.of(0, 10);
+
         // when
-        List<OrderResponse> allOrders = orderService.getAllOrders();
+        Page<OrderResponse> allOrders = orderService.getAllOrders(pageable);
 
         // then
-        assertThat(allOrders).isEqualTo(2);
-        assertThat(allOrders).extracting("orderId").contains(orderId1, orderId2);
+        // 전체 주문의 갯수 확인
+        assertThat(allOrders.getTotalElements()).isEqualTo(2);
+        assertThat(allOrders.getTotalPages()).isEqualTo(1);
+        assertThat(allOrders.getContent()).hasSize(2);
+        assertThat(allOrders.getContent()).extracting("orderId").contains(orderId1, orderId2);
         log.info(allOrders.toString());
 
     }
@@ -154,6 +162,25 @@ class OrderServiceTest {
         assertThat(order.getTotalPrice()).isEqualTo(7500);
         assertThat(order.getOrderItems()).hasSize(1);
         assertThat(order.getOrderItems().get(0).getQuantity()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("주문 검색 테스트")
+    void searchOrderTest() throws Exception {
+
+        OrderRequest request = new OrderRequest(
+                "user@example.com", "Daegu", "44444",
+                List.of(new OrderItemRequest(1L, 2)), 6000
+        );
+
+        Long orderId = orderService.createOrder(request);
+
+        Optional<OrderResponse> findOrderId = orderService.searchOrder(orderId);
+
+        log.info("findOrderId : {} ", findOrderId.orElse(null));
+        assertThat(findOrderId.isPresent()).isTrue();
+        assertThat(findOrderId.get().getOrderId()).isEqualTo(orderId);
+
     }
 
     @Test

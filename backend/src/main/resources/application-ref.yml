@@ -36,6 +36,8 @@ spring:
 custom:
   mail:
     subject: IPv6 커피 구매 내역
+  file:
+    path: ${user.home}/devcourse/images/  # 파일 저장 경로
 
 ---
 # dev profile

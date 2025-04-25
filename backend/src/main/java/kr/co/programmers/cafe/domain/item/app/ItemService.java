@@ -39,6 +39,7 @@ public class ItemService {
         String filePath = fileManager.saveFile(itemCreateForm.getImage());
         Item item = Item.builder()
                 .name(itemCreateForm.getName())
+                .description(itemCreateForm.getDescription())
                 .price(itemCreateForm.getPrice())
                 .category(Category.valueOf(itemCreateForm.getCategory()))
                 .image(filePath)
@@ -70,7 +71,7 @@ public class ItemService {
 
     /**
      * 생성, 수정 시간을 제외한 정보만 전달해주도록 findAll 기능추가
-     * */
+     */
     public List<ItemSimpleResponse> findAllItems() {
         List<Item> items = itemRepository.findAll();
         return items.stream()
@@ -122,6 +123,7 @@ public class ItemService {
             filePath = fileManager.saveFile(itemEditForm.getImage());
         }
         item.update(itemEditForm.getName(),
+                itemEditForm.getDescription(),
                 itemEditForm.getPrice(),
                 Category.valueOf(itemEditForm.getCategory()),
                 filePath);

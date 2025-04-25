@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class ItemCreateForm {
     private String name;
+    private String description;
     private String category;
     private int price;
     private MultipartFile image;

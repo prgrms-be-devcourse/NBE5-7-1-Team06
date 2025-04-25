@@ -20,11 +20,18 @@
     </div>
 
     <div class="form-field">
+        <label for="name" class="form-label">설명:</label>
+        <input type="text" id="description" name="description" required class="form-input"
+               th:value="${itemEditForm?.description}">
+    </div>
+
+    <div class="form-field">
         <label for="category" class="form-label">카테고리:</label>
         <select id="category" name="category" required class="form-input">
-            <option value="A" th:selected="${itemEditForm?.category == 'A'}">A</option>
-            <option value="B" th:selected="${itemEditForm?.category == 'B'}">B</option>
-            <option value="C" th:selected="${itemEditForm?.category == 'C'}">C</option>
+            <option value="BEAN" th:selected="${itemEditForm?.category == 'BEAN'}">BEAN</option>
+            <option value="TEA" th:selected="${itemEditForm?.category == 'TEA'}">TEA</option>
+            <option value="GOODS" th:selected="${itemEditForm?.category == 'GOODS'}">GOODS</option>
+            <option value="OTHER" th:selected="${itemEditForm?.category == 'OTHER'}">OTHER</option>
         </select>
     </div>
 
