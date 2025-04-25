@@ -4,9 +4,7 @@ package kr.co.programmers.cafe.domain.order.app;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import kr.co.programmers.cafe.domain.item.app.ItemService;
 import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
-import kr.co.programmers.cafe.domain.item.dto.ItemSimpleResponse;
 import kr.co.programmers.cafe.domain.item.entity.Category;
 import kr.co.programmers.cafe.domain.item.entity.Item;
 import kr.co.programmers.cafe.domain.order.dto.OrderItemRequest;
@@ -58,14 +56,16 @@ class OrderServiceTest {
         itemRepository.saveAll(List.of(
                 Item.builder()
                         .name("Americano")
+                        .description("test")
                         .price(3000)
-                        .category(Category.A)
+                        .category(Category.BEAN)
                         .image("img1.png")
                         .build(),
                 Item.builder()
                         .name("Croissant")
+                        .description("test2")
                         .price(2500)
-                        .category(Category.B)
+                        .category(Category.TEA)
                         .image("img2.png")
                         .build()
         ));

@@ -2,6 +2,7 @@ package kr.co.programmers.cafe.domain.item.api;
 
 import kr.co.programmers.cafe.domain.item.app.ItemService;
 import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
+import kr.co.programmers.cafe.global.util.FileManager;
 import kr.co.programmers.cafe.domain.item.dto.ItemSimpleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
+    private final FileManager fileManager;
 
     /**
      * 페이지네이션이 적용된 아이템 목록을 조회합니다.
@@ -71,22 +73,7 @@ public class ItemController {
         Resource resource = itemService.getImage(itemId);
         String filePath = resource.getFilename();
 
-        MediaType mediaType = MediaType.IMAGE_PNG;
-        if (filePath != null) {
-            String extension = filePath.substring(filePath.lastIndexOf(".") + 1).toLowerCase();
-            switch (extension) {
-                case "jpg":
-                case "jpeg":
-                    mediaType = MediaType.IMAGE_JPEG;
-                    break;
-                case "gif":
-                    mediaType = MediaType.IMAGE_GIF;
-                    break;
-                case "png":
-                    mediaType = MediaType.IMAGE_PNG;
-                    break;
-            }
-        }
+        MediaType mediaType = fileManager.getMediaType(filePath);
         return ResponseEntity.ok()
                 .contentType(mediaType)
                 .body(resource);

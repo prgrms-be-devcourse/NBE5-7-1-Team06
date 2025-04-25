@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 public class ItemResponse implements Serializable {
     private final Long id;
     private final String name;
+    private final String description;
     private final Integer price;
     private final Category category;
     private final String imageName;
@@ -28,6 +29,7 @@ public class ItemResponse implements Serializable {
         return ItemResponse.builder()
                 .id(item.getId())
                 .name(item.getName())
+                .description(item.getDescription())
                 .price(item.getPrice())
                 .category(item.getCategory())
                 .imageName(item.getImage())

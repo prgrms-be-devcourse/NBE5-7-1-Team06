@@ -3,6 +3,7 @@ package kr.co.programmers.cafe.domain.item.api;
 import kr.co.programmers.cafe.domain.item.app.ItemService;
 import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
 import kr.co.programmers.cafe.domain.item.entity.Category;
+import kr.co.programmers.cafe.global.util.FileManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -32,6 +34,8 @@ class ItemControllerTest {
 
     @MockitoBean
     private ItemService itemService;
+    @MockitoBean
+    private FileManager fileManager;
 
     @Autowired
     private MockMvc mockMvc;
@@ -42,8 +46,9 @@ class ItemControllerTest {
         testItemResponse = ItemResponse.builder()
                 .id(1L)
                 .name("Americano")
+                .description("test")
                 .price(4500)
-                .category(Category.A)
+                .category(Category.BEAN)
                 .imageName("test-image.jpg")
                 .build();
     }
@@ -84,6 +89,7 @@ class ItemControllerTest {
         };
 
         given(itemService.getImage(anyLong())).willReturn(mockResource);
+        given(fileManager.getMediaType(anyString())).willReturn(MediaType.IMAGE_JPEG);
 
         mockMvc.perform(get("/api/items/{id}/images", 1L))
                 .andExpect(status().isOk())
