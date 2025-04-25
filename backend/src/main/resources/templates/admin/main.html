@@ -30,6 +30,9 @@
     <a href="/admin/orders">
         <button class="admin-btn">주문 관리</button>
     </a>
+    <form th:action="@{/admin/logout}" method="post" style="margin:0;">
+        <button type="submit" class="admin-btn">로그아웃</button>
+    </form>
 </div>
 </body>
 </html>
