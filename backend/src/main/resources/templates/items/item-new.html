@@ -10,11 +10,11 @@
 
 <form th:action="@{/admin/items}" method="post" enctype="multipart/form-data" class="form-container"
       th:object="${itemCreateRequest}">
-<div class="form-field">
+    <div class="form-field">
         <label for="name" class="form-label">상품명:</label>
-    <input type="text" id="name" name="name" required class="form-input"
-           th:value="${itemCreateRequest?.name}">
-</div>
+        <input type="text" id="name" name="name" required class="form-input"
+               th:value="${itemCreateRequest?.name}">
+    </div>
 
     <div class="form-field">
         <label for="category" class="form-label">카테고리:</label>
