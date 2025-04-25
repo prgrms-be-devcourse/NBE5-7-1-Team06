@@ -52,7 +52,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponse);
     }
 
-    @GetMapping("/items")
+    @GetMapping("/all")
     public ResponseEntity<List<ItemSimpleResponse>> readAllItems(){
         List<ItemSimpleResponse> items = itemService.findAllItems();
         return ResponseEntity.ok(items);
