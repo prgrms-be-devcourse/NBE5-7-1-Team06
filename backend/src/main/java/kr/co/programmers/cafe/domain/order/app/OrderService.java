@@ -252,6 +252,7 @@ public class OrderService {
                             .mailAddress(key.email)
                             .address(key.address)
                             .zipCode(key.zipCode)
+                            .deliveryStartedAt(LocalDateTime.now())
                             .totalPrice(totalPrice.get())
                             .items(itemMailSendRequests)
                             .build();
