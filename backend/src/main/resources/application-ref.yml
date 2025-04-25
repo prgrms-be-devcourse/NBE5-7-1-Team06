@@ -35,7 +35,8 @@ spring:
 
 custom:
   mail:
-    subject: IPv6 커피 구매 내역
+    receiptSubject: IPv6 커피 구매 내역
+    startDeliverySubject: IPv6 커피 배송 시작 안내
   file:
     path: ${user.home}/devcourse/images/  # 파일 저장 경로
 

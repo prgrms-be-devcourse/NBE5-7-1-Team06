@@ -2,6 +2,7 @@ package kr.co.programmers.cafe.domain.mail.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import kr.co.programmers.cafe.domain.mail.dto.DeliveringMailSendRequest;
 import kr.co.programmers.cafe.domain.mail.dto.ReceiptMailSendRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 
 @Service
 @Slf4j
@@ -27,41 +29,52 @@ public class MailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    @Value("${custom.mail.subject}")
-    private String subject;
+    @Value("${custom.mail.receiptSubject}")
+    private String receiptSubject;
 
-    /**
-     * 구매 내역을 메일로 전송
-     * @param receiptSend 메일로 전송할 주문 정보
-     */
-    public void sendReceiptMail(ReceiptMailSendRequest receiptSend) {
+    @Value("${custom.mail.startDeliverySubject}")
+    private String startDeliverySubject;
+
+
+    public void sendReceiptMail(ReceiptMailSendRequest receiptRequest) {
+        Context context = new Context();
+        String orderId = receiptRequest.getOrderedAt().format(BASIC) + receiptRequest.getOrderId();
+        context.setVariable("orderId", orderId);
+        context.setVariable("orderedAt", receiptRequest.getOrderedAt().format(DASHED));
+        context.setVariable("address", receiptRequest.getAddress());
+        context.setVariable("zipCode", receiptRequest.getZipCode());
+        context.setVariable("items", receiptRequest.getItems());
+        context.setVariable("totalPrice", receiptRequest.getTotalPrice());
+
+        sendTemplateMail(
+                receiptRequest.getMailAddress(), receiptSubject, "mail/receipt-mail", context
+        );
+    }
+
+    public void sendDeliveringMail(DeliveringMailSendRequest deliveringRequest) {
+        Context context = new Context();
+        context.setVariable("deliveryStartedAt", deliveringRequest.getDeliveryStartedAt().format(DASHED));
+        context.setVariable("address", deliveringRequest.getAddress());
+        context.setVariable("zipCode", deliveringRequest.getZipCode());
+        context.setVariable("items", deliveringRequest.getItems());
+        context.setVariable("totalPrice", deliveringRequest.getTotalPrice());
+
+        sendTemplateMail(
+                deliveringRequest.getMailAddress(), startDeliverySubject, "mail/delivering-mail", context
+        );
+    }
+
+    private void sendTemplateMail(String to, String subject, String templateName, Context context) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-            // 템플릿 엔진에 넘겨줄 구매 내역 Context 작성
-            Context context = new Context();
+            String body = templateEngine.process(templateName, context);
 
-            String orderId = receiptSend.getOrderedAt().format(BASIC) + receiptSend.getOrderId();
-            context.setVariable("orderId", orderId);
-
-            String orderedAt = receiptSend.getOrderedAt().format(DASHED);
-            context.setVariable("orderedAt", orderedAt);
-
-            context.setVariable("address", receiptSend.getAddress());
-            context.setVariable("zipCode", receiptSend.getZipCode());
-            context.setVariable("items", receiptSend.getItems());
-            context.setVariable("totalPrice", receiptSend.getTotalPrice());
-
-            // 타임리프 템플릿과 구매 내역 Context로 메일 본문 내용 생성
-            String body = templateEngine.process("mail/mail-template", context);
-
-            // mime 메시지에 수신자 이메일 주소, 메일 제목, 메일 본문 추가
-            mimeMessageHelper.setTo(receiptSend.getMailAddress());
+            mimeMessageHelper.setTo(to);
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setText(body, true);
 
-            // 메일 전송
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             log.error("이메일 전송 오류 : " + e.getMessage());
@@ -69,5 +82,10 @@ public class MailService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void sendDeliveringMails(Collection<DeliveringMailSendRequest> deliveringRequests) {
+        // JavaMailSender가 thread-safe하기 때문에, 메일을 병렬 처리 방식으로 보낼 수 있다.
+        deliveringRequests.parallelStream().forEach(this::sendDeliveringMail);
     }
 }
