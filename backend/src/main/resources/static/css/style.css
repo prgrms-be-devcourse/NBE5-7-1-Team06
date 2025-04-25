@@ -90,15 +90,19 @@ td {
 }
 
 .col-name {
-    width: 25%;
+    width: 15%;
+}
+
+.col-description {
+    width: 20%;
 }
 
 .col-category {
-    width: 15%;
+    width: 10%;
 }
 
 .col-price {
-    width: 15%;
+    width: 10%;
 }
 
 .col-date {

@@ -39,6 +39,7 @@ public class ItemService {
         String filePath = fileManager.saveFile(itemCreateForm.getImage());
         Item item = Item.builder()
                 .name(itemCreateForm.getName())
+                .description(itemCreateForm.getDescription())
                 .price(itemCreateForm.getPrice())
                 .category(Category.valueOf(itemCreateForm.getCategory()))
                 .image(filePath)
