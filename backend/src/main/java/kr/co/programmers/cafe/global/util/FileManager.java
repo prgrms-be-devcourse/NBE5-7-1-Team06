@@ -3,6 +3,7 @@ package kr.co.programmers.cafe.global.util;
 import jakarta.annotation.PostConstruct;
 import kr.co.programmers.cafe.global.exception.FileNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -17,7 +18,8 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class FileManager {
-    private static final String IMAGE_DIRECTORY = System.getProperty("user.home") + "/devcourse/images/";
+    @Value("${custom.file.path}")
+    private String IMAGE_DIRECTORY;
 
     @PostConstruct
     public void init() {
