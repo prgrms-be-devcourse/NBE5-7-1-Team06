@@ -149,6 +149,19 @@ class AdminControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+
+    @Test
+    void deleteItem_Success() throws Exception {
+        mockMvc.perform(multipart("/admin/items/1")
+                        .with(request -> {
+                            request.setMethod("DELETE");
+                            return request;
+                        })
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/items"));
+    }
+
     @Test
     void updateItem_WithInvalidId_ShouldReturn404() throws Exception {
         MockMultipartFile imageFile = new MockMultipartFile(
