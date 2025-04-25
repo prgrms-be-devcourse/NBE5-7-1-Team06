@@ -4,6 +4,7 @@ package kr.co.programmers.cafe.domain.order.app;
 import jakarta.transaction.Transactional;
 import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.item.entity.Item;
+import kr.co.programmers.cafe.domain.mail.dto.DeliveringMailSendRequest;
 import kr.co.programmers.cafe.domain.mail.dto.ItemMailSendRequest;
 import kr.co.programmers.cafe.domain.mail.dto.ReceiptMailSendRequest;
 import kr.co.programmers.cafe.domain.mail.service.MailService;
@@ -16,12 +17,14 @@ import kr.co.programmers.cafe.domain.order.entity.OrderItem;
 import kr.co.programmers.cafe.domain.order.entity.Status;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -184,6 +187,78 @@ public class OrderService {
         order.changeStatus(status);
     }
 
+    /**
+     * 주문 배송 스케줄링 메소드
+     * 매일 오후 두 시에 주문 배송 진행
+     */
+    @Scheduled(cron = "0 0 14 * * *", zone = "Asia/Seoul")
+    @Transactional
+    public void executeOrderDelivery() {
+        List<Order> foundOrders = orderRepository.findOrdersWithItemsByTimeAndStatus(
+                LocalDateTime.now(), Status.ORDERED
+        );
 
+        // 조회된 주문들의 상태를 COMPLETED(배송 중)으로 변경
+        for (Order order : foundOrders) {
+            order.changeStatus(Status.COMPLETED);
+        }
+
+        // 메일 발송 단위를 구분하기 위한 그룹 기준 (email + address + zipCode)
+        record Key (String email, String address, String zipCode) {}
+
+        // 같은 메일 주소, 배송 주소, 우편 번호를 가지는 주문들을 그룹화
+        Map<Key, List<Order>> grouped = foundOrders.stream()
+                .collect(Collectors.groupingBy(
+                        o -> new Key(o.getEmail(), o.getAddress(), o.getZipCode())
+                ));
+
+        // 각 그룹에 대해 배송 시작 안내 메일 전송 요청 DTO 생성
+        List<DeliveringMailSendRequest> deliveringMailSendRequests = grouped.entrySet().stream()
+                .map(e -> {
+                    Key key = e.getKey();
+                    List<Order> orders = e.getValue();
+
+                    // 주문에 포함된 상품들을 Item ID 기준으로 묶어 수량 합산
+                    Map<Long, Integer> orderItems = orders.stream()
+                            .flatMap(o -> o.getOrderItems().stream())
+                            .collect(Collectors.groupingBy(
+                                    oi -> oi.getItem().getId(),
+                                    Collectors.summingInt(OrderItem::getQuantity)
+                            ));
+
+                    // 총 결제 금액 계산 및 ItemMailSendRequest 목록 구성
+                    // 람다 내부에서는 final 변수만 사용 가능하기 때문에, int나 Integer 대신에 AtomicInteger 사용
+                    AtomicInteger totalPrice = new AtomicInteger();
+                    List<ItemMailSendRequest> itemMailSendRequests = orderItems.entrySet().stream()
+                            .map(oi -> {
+                                // 위에서 Item ID 기준으로 묶은 상품의 정보를 검색 후 DTO 생성
+                                Long itemId = oi.getKey();
+                                Item item = itemRepository.findById(itemId)
+                                        .orElseThrow(NoSuchElementException::new);
+                                Integer quantity = oi.getValue();
+
+                                totalPrice.getAndAdd(item.getPrice() * quantity);
+
+                                return ItemMailSendRequest.builder()
+                                        .name(item.getName())
+                                        .price(item.getPrice())
+                                        .quantity(quantity)
+                                        .build();
+                            })
+                            .toList();
+
+                    // 배송 시작 안내 메일 전송 요청 DTO 생성
+                    return DeliveringMailSendRequest.builder()
+                            .mailAddress(key.email)
+                            .address(key.address)
+                            .zipCode(key.zipCode)
+                            .totalPrice(totalPrice.get())
+                            .items(itemMailSendRequests)
+                            .build();
+                })
+                .toList();
+
+        // 배송 시작 안내 메일 전송
+        mailService.sendDeliveringMails(deliveringMailSendRequests);
+    }
 }
-
