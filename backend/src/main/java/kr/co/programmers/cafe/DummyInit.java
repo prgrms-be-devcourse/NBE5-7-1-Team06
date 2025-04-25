@@ -19,8 +19,7 @@ public class DummyInit {
         Item item1 = Item.builder()
                 .name("아메리카노")
                 .price(4000)
-                .category(Category.BEAN)
-                .description("설명")
+                .category(Category.A)
                 .build();
 
         itemRepository.save(item1);
@@ -28,8 +27,7 @@ public class DummyInit {
         Item item2 = Item.builder()
                 .name("카페라떼")
                 .price(5000)
-                .category(Category.BEAN)
-                .description("설명")
+                .category(Category.A)
                 .build();
 
         itemRepository.save(item2);
@@ -37,8 +35,7 @@ public class DummyInit {
         Item item3 = Item.builder()
                 .name("카푸치노")
                 .price(4500)
-                .category(Category.BEAN)
-                .description("설명")
+                .category(Category.A)
                 .build();
 
         itemRepository.save(item3);
@@ -46,8 +43,7 @@ public class DummyInit {
         Item item4 = Item.builder()
                 .name("카라멜마끼야또")
                 .price(6000)
-                .category(Category.BEAN)
-                .description("설명")
+                .category(Category.A)
                 .build();
 
         itemRepository.save(item4);
@@ -55,8 +51,7 @@ public class DummyInit {
         Item item5 = Item.builder()
                 .name("아포가토")
                 .price(8000)
-                .category(Category.BEAN)
-                .description("설명")
+                .category(Category.A)
                 .build();
 
         itemRepository.save(item5);
@@ -64,8 +59,7 @@ public class DummyInit {
         Item item6 = Item.builder()
                 .name("에스프레소")
                 .price(3000)
-                .category(Category.BEAN)
-                .description("설명")
+                .category(Category.A)
                 .build();
 
         itemRepository.save(item6);
@@ -73,8 +67,7 @@ public class DummyInit {
         Item item7 = Item.builder()
                 .name("레몬에이드")
                 .price(4000)
-                .category(Category.TEA)
-                .description("설명")
+                .category(Category.B)
                 .build();
 
         itemRepository.save(item7);
@@ -82,8 +75,7 @@ public class DummyInit {
         Item item8 = Item.builder()
                 .name("자몽에이드")
                 .price(4000)
-                .category(Category.TEA)
-                .description("설명")
+                .category(Category.B)
                 .build();
 
         itemRepository.save(item8);
@@ -91,8 +83,7 @@ public class DummyInit {
         Item item9 = Item.builder()
                 .name("청포도에이드")
                 .price(4000)
-                .category(Category.TEA)
-                .description("설명")
+                .category(Category.B)
                 .build();
 
         itemRepository.save(item9);
@@ -100,8 +91,7 @@ public class DummyInit {
         Item item10 = Item.builder()
                 .name("청귤에이드")
                 .price(4000)
-                .category(Category.OTHER)
-                .description("설명")
+                .category(Category.B)
                 .build();
 
         itemRepository.save(item10);
