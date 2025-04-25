@@ -1,4 +1,4 @@
-package kr.co.programmers.cafe;
+package kr.co.programmers.cafe.global.security;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,11 @@ public class SecurityTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String ADMIN_USERNAME = "admin";
-    private static final String ADMIN_PASSWORD = "1234";
+    private static final String ADMIN_USERNAME = "example";   // 테스트 yml 에 작성한 값 입력하시면 됩니다.
+    private static final String ADMIN_PASSWORD = "example";   // 테스트 yml 에 작성한 값 입력하시면 됩니다.
 
     private static final String LOGIN_URL = "/admin/login";
-    private static final String MANAGE_URL = "/admin/manage";
+    private static final String ADMIN_MAIN = "/admin";
 
     // 내부 IP + ADMIN 권한 → 성공
     @Test
@@ -37,7 +37,7 @@ public class SecurityTests {
                             return request;
                         }))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl(MANAGE_URL));
+                .andExpect(redirectedUrl(ADMIN_MAIN));
     }
 
     // 내부 IP + USER 권한 → 실패 (Spring Security 자체 로직 실패 → login?error 리다이렉트)

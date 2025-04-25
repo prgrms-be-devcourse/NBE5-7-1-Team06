@@ -4,11 +4,14 @@ import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
 import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
 import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
+import kr.co.programmers.cafe.domain.item.dto.ItemSimpleResponse;
 import kr.co.programmers.cafe.domain.item.entity.Category;
 import kr.co.programmers.cafe.domain.item.entity.Item;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import kr.co.programmers.cafe.global.util.FileManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
 
@@ -81,6 +85,47 @@ class ItemServiceTest {
     }
 
     @Test
+    @DisplayName("모든 아이템을 조회하면 이름과 카테고리를 포함한 단순 응답 리스트를 반환한다")
+    void findAllItems_test() {
+        // given
+        Item item1 = Item.builder()
+                .id(1L)
+                .name("Americano")
+                .price(4500)
+                .category(Category.A)
+                .image("americano.jpg")
+                .build();
+
+        Item item2 = Item.builder()
+                .id(2L)
+                .name("Latte")
+                .price(5000)
+                .category(Category.B)
+                .image("latte.jpg")
+                .build();
+
+        given(itemRepository.findAll()).willReturn(List.of(item1, item2));
+
+        // when
+        List<ItemSimpleResponse> items = itemService.findAllItems();
+
+        // then
+        assertThat(items).hasSize(2);
+
+        ItemSimpleResponse first = items.get(0);
+        assertThat(first.getName()).isEqualTo("Americano");
+        assertThat(first.getCategory()).isEqualTo(Category.A);
+        assertThat(first.getImageName()).isEqualTo("americano.jpg");
+
+        ItemSimpleResponse second = items.get(1);
+        assertThat(second.getName()).isEqualTo("Latte");
+        assertThat(second.getCategory()).isEqualTo(Category.B);
+        assertThat(second.getImageName()).isEqualTo("latte.jpg");
+
+        log.info("조회된 아이템 리스트: {}", items);
+    }
+
+    @Test
     void createItem_Success() {
         given(fileManager.saveFile(any())).willReturn("saved-image.jpg");
         given(itemRepository.save(any(Item.class))).willReturn(testItem);
@@ -111,7 +156,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void findAllItems_Success() {
+    void findAll_Success() {
         given(itemRepository.findAll()).willReturn(List.of(testItem));
 
         List<ItemResponse> items = itemService.findAll();

@@ -3,6 +3,7 @@ package kr.co.programmers.cafe.domain.item.api;
 import kr.co.programmers.cafe.domain.item.app.ItemService;
 import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
 import kr.co.programmers.cafe.global.util.FileManager;
+import kr.co.programmers.cafe.domain.item.dto.ItemSimpleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/items")
@@ -51,6 +54,12 @@ public class ItemController {
         return ResponseEntity.ok(itemResponse);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<ItemSimpleResponse>> readAllItems(){
+        List<ItemSimpleResponse> items = itemService.findAllItems();
+        return ResponseEntity.ok(items);
+    }
+
     /**
      * 특정 아이템의 이미지를 조회합니다.
      * 이미지 파일 확장자에 따라 적절한 MediaType을 설정합니다.
@@ -69,4 +78,6 @@ public class ItemController {
                 .contentType(mediaType)
                 .body(resource);
     }
+
+
 }

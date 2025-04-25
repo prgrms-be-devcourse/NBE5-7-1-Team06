@@ -5,6 +5,7 @@ import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
 import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
 import kr.co.programmers.cafe.domain.item.dto.ItemResponse;
+import kr.co.programmers.cafe.domain.item.dto.ItemSimpleResponse;
 import kr.co.programmers.cafe.domain.item.entity.Category;
 import kr.co.programmers.cafe.domain.item.entity.Item;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional
@@ -64,6 +66,22 @@ public class ItemService {
         return itemRepository.findAll().stream()
                 .map(ItemResponse::of)
                 .toList();
+    }
+
+    /**
+     * 생성, 수정 시간을 제외한 정보만 전달해주도록 findAll 기능추가
+     * */
+    public List<ItemSimpleResponse> findAllItems() {
+        List<Item> items = itemRepository.findAll();
+        return items.stream()
+                .map(item -> ItemSimpleResponse.builder()
+                        .id(item.getId())
+                        .name(item.getName())
+                        .price(item.getPrice())
+                        .category(item.getCategory())
+                        .imageName(item.getImage())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     /**
