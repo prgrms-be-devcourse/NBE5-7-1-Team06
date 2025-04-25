@@ -158,23 +158,43 @@ public class OrderService {
                 .build());
     }
 
-    // 목록 단건 조회용
+    // 목록 검색용
+//    @Transactional
+//    public Optional<OrderResponse> searchOrder(Long orderId) {
+//        return orderRepository.findById(orderId)
+//                .map(order -> OrderResponse.builder()
+//                        .orderId(order.getId())
+//                        .email(order.getEmail())
+//                        .address(order.getAddress())
+//                        .totalPrice(order.getTotalPrice())
+//                        .status(order.getStatus())
+//                        .orderItems(order.getOrderItems().stream()
+//                                .map(orderItem -> OrderItemResponse.builder()
+//                                        .name(orderItem.getItem().getName())
+//                                        .quantity(orderItem.getQuantity())
+//                                        .build())
+//                                .toList())
+//                        .build());
+//    }
     @Transactional
     public Optional<OrderResponse> searchOrder(Long orderId) {
-        return orderRepository.findById(orderId)
-                .map(order -> OrderResponse.builder()
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        return optionalOrder.map(
+                order -> OrderResponse.builder()
                         .orderId(order.getId())
                         .email(order.getEmail())
                         .address(order.getAddress())
+                        .zipCode(order.getZipCode())
                         .totalPrice(order.getTotalPrice())
                         .status(order.getStatus())
-                        .orderItems(order.getOrderItems().stream()
-                                .map(orderItem -> OrderItemResponse.builder()
-                                        .name(orderItem.getItem().getName())
-                                        .quantity(orderItem.getQuantity())
-                                        .build())
-                                .toList())
-                        .build());
+                        .orderItems(order.getOrderItems().stream().map(
+                                        orderItem -> OrderItemResponse.builder()
+                                                .name(orderItem.getItem().getName())
+                                                .quantity(orderItem.getQuantity())
+                                                .build()
+                                ).toList()
+                        ).build()
+        );
     }
 
     @Transactional
@@ -186,4 +206,5 @@ public class OrderService {
 
 
 }
+
 
