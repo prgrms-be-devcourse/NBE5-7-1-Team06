@@ -19,13 +19,13 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class MailService {
 
-    private final JavaMailSender mailSender;
-    private final TemplateEngine templateEngine;
-
     // 표준 ISO 포맷(yyyy-MM-dd)
     public static final DateTimeFormatter DASHED = DateTimeFormatter.ISO_LOCAL_DATE;
     // 기본 ISO 기본 포맷(yyyyMMdd)
     public static final DateTimeFormatter BASIC  = DateTimeFormatter.BASIC_ISO_DATE;
+
+    private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
     @Value("${custom.mail.subject}")
     private String subject;
