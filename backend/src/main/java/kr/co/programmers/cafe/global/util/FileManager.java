@@ -1,6 +1,7 @@
 package kr.co.programmers.cafe.global.util;
 
 import jakarta.annotation.PostConstruct;
+import kr.co.programmers.cafe.global.exception.FileNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -9,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
@@ -27,8 +27,8 @@ public class FileManager {
         }
     }
 
-    public String getFullPath(String filePath) {
-        return IMAGE_DIRECTORY + "/" + filePath;
+    public String getAbsolutePath(String fileName) {
+        return IMAGE_DIRECTORY + "/" + fileName;
     }
 
     //이미지 파일을 home/devcourse/images/에 저장합니다.
@@ -40,7 +40,7 @@ public class FileManager {
         String originalFilename = file.getOriginalFilename();
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String savedFileName = UUID.randomUUID() + extension;
-        String savedPath = getFullPath(savedFileName);
+        String savedPath = getAbsolutePath(savedFileName);
 
         try {
             file.transferTo(Path.of(savedPath).toFile());
@@ -52,41 +52,24 @@ public class FileManager {
     }
 
     //해당 이미지 파일을 삭제합니다.
-    public void deleteFile(String filePath) {
-        if (filePath == null) {
+    public void deleteFile(String fileName) {
+        if (fileName == null) {
             return;
         }
-        File file = Path.of(getFullPath(filePath)).toFile();
+        File file = Path.of(getAbsolutePath(fileName)).toFile();
         if (file.exists()) {
             file.delete();
         }
     }
 
-    public byte[] getFile(String filePath) {
-        if (filePath == null) {
-            return null;
+    public Resource getFileResource(String fileName) {
+        if (fileName == null) {
+            throw new FileNotFoundException(null);
         }
-        String fullPath = getFullPath(filePath);
-        File file = new File(fullPath);
-        if (!file.exists()) {
-            return null;
-        }
-
-        try {
-            return Files.readAllBytes(file.toPath());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read file", e);
-        }
-    }
-
-    public Resource getFileResource(String filePath) {
-        if (filePath == null) {
-            return null;
-        }
-        String fullPath = getFullPath(filePath);
+        String fullPath = getAbsolutePath(fileName);
         Resource resource = new FileSystemResource(Path.of(fullPath));
         if (!resource.exists()) {
-            return null;
+            throw new FileNotFoundException(null);
         }
         return resource;
     }
