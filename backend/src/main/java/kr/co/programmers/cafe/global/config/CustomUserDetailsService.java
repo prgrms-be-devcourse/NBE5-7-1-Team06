@@ -15,26 +15,19 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserDetails userDetails;
-    private final String username;
-    private final String password;
-    private final String roles;
     private final PasswordEncoder encoder;
+    private final AdminProperties adminProperties;
 
     // yml 파일 기반 인증 정보를 담은 UserDetails 생성
-    public CustomUserDetailsService(@Value("${spring.security.user.name}") String username,
-                                    @Value("${spring.security.user.password}") String password,
-                                    @Value("${spring.security.user.roles}") String roles,
-                                    PasswordEncoder encoder) {
-        log.info("roles = {}", roles);
+    public CustomUserDetailsService(AdminProperties adminProperties, PasswordEncoder encoder) {
 
         this.encoder = encoder;
-        this.username = username;
-        this.password = password;
-        this.roles = roles;
+        this.adminProperties = adminProperties;
+
         this.userDetails = User.builder()
-                .username(username)
-                .password(this.encoder.encode(password))
-                .roles(roles)
+                .username(adminProperties.getName())
+                .password(encoder.encode(adminProperties.getPassword()))
+                .roles(adminProperties.getRoles())
                 .build();
     }
 
@@ -55,9 +48,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("Authorities = {}", userDetails.getAuthorities());
 
         return User.builder()
-                .username(this.username)
-                .password(encoder.encode(this.password))
-                .roles(this.roles)
+                .username(adminProperties.getName())
+                .password(encoder.encode(adminProperties.getPassword()))
+                .roles(adminProperties.getRoles())
                 .build();
     }
 }
