@@ -47,7 +47,7 @@ export default function CartSideBar({ cartItems, onUpdateQuantity, onClose }) {
       };
   
       try {
-        const response = await api.post("/orders", orderData);
+        const response = await api.post("/order", orderData);
         alert("주문이 완료되었습니다!");
         console.log("서버 응답:", response.data);
       } catch (error) {
