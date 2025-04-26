@@ -41,10 +41,11 @@ public class AdminController {
     @GetMapping("/login")
     public String adminLogin(@RequestParam(required = false) String error, Model model) {
         log.info("로그인 페이지");
+        log.error("error: {}", error);
         if (error != null) {
             switch (error) {
                 case "ip_blocked" -> model.addAttribute("errorMessage", "외부 IP 에선 접속이 불가능합니다!");
-                case "login-failed" -> model.addAttribute("errorMessage", "올바르지 않은 계정입니다!");
+                case "login_failed" -> model.addAttribute("errorMessage", "올바르지 않은 계정입니다!");
             }
             log.error("로그인 실패");
         }
