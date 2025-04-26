@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -148,33 +149,30 @@ public class OrderService {
                 .zipCode(order.getZipCode())
                 .totalPrice(order.getTotalPrice())
                 .status(order.getStatus())
-                .orderItems(order.getOrderItems().stream()
-                        .map(orderItem -> OrderItemResponse.builder()
-                                .name(orderItem.getItem().getName())
-                                .price(orderItem.getItem().getPrice())
-                                .quantity(orderItem.getQuantity())
-                                .build())
-                        .collect(Collectors.toList()))
                 .build());
     }
 
-    // 목록 단건 조회용
     @Transactional
     public Optional<OrderResponse> searchOrder(Long orderId) {
-        return orderRepository.findById(orderId)
-                .map(order -> OrderResponse.builder()
+        Optional<Order> optionalOrder = Optional.ofNullable(orderRepository.findById(orderId).orElseThrow(
+                () -> new NoSuchElementException(" 해당 주문을 찾을 수 없습니다.")
+        ));
+        return optionalOrder.map(
+                order -> OrderResponse.builder()
                         .orderId(order.getId())
                         .email(order.getEmail())
                         .address(order.getAddress())
+                        .zipCode(order.getZipCode())
                         .totalPrice(order.getTotalPrice())
                         .status(order.getStatus())
-                        .orderItems(order.getOrderItems().stream()
-                                .map(orderItem -> OrderItemResponse.builder()
-                                        .name(orderItem.getItem().getName())
-                                        .quantity(orderItem.getQuantity())
-                                        .build())
-                                .toList())
-                        .build());
+                        .orderItems(order.getOrderItems().stream().map(
+                                        orderItem -> OrderItemResponse.builder()
+                                                .name(orderItem.getItem().getName())
+                                                .quantity(orderItem.getQuantity())
+                                                .build()
+                                ).toList()
+                        ).build()
+        );
     }
 
     @Transactional
@@ -186,4 +184,5 @@ public class OrderService {
 
 
 }
+
 
