@@ -186,7 +186,7 @@ public class OrderService {
      * 매일 오후 두 시에 주문 배송 진행
      */
     @Scheduled(cron = "0 0 14 * * *", zone = "Asia/Seoul")
-    @Transactional(readOnly = true)
+    @Transactional
     public void executeOrderDelivery() {
         List<Order> foundOrders = orderRepository.findByOrderedAtGreaterThanEqualAndStatus(
                 LocalDateTime.now(), Status.ORDERED
