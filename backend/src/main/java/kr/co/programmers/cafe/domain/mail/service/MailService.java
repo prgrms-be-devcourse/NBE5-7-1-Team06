@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -22,9 +23,9 @@ import java.util.Collection;
 public class MailService {
 
     // 표준 ISO 포맷(yyyy-MM-dd)
-    public static final DateTimeFormatter DASHED = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final DateTimeFormatter DASHED = DateTimeFormatter.ISO_LOCAL_DATE;
     // 기본 ISO 기본 포맷(yyyyMMdd)
-    public static final DateTimeFormatter BASIC  = DateTimeFormatter.BASIC_ISO_DATE;
+    private static final DateTimeFormatter BASIC  = DateTimeFormatter.BASIC_ISO_DATE;
 
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
@@ -64,7 +65,8 @@ public class MailService {
         );
     }
 
-    private void sendTemplateMail(String to, String subject, String templateName, Context context) {
+    @Async
+    protected void sendTemplateMail(String to, String subject, String templateName, Context context) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -84,6 +86,7 @@ public class MailService {
         }
     }
 
+    @Async
     public void sendDeliveringMails(Collection<DeliveringMailSendRequest> deliveringRequests) {
         // JavaMailSender가 thread-safe하기 때문에, 메일을 병렬 처리 방식으로 보낼 수 있다.
         deliveringRequests.parallelStream().forEach(this::sendDeliveringMail);
