@@ -41,12 +41,10 @@
   }
   
   .menu-list {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 24px;
-    overflow-x: auto;
-    padding-bottom: 24px;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: 24px;
   }
   
   .menu-card {
