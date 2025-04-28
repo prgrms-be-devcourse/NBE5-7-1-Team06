@@ -1,6 +1,5 @@
 package kr.co.programmers.cafe.domain.item.app;
 
-import jakarta.transaction.Transactional;
 import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.item.dto.ItemCreateForm;
 import kr.co.programmers.cafe.domain.item.dto.ItemEditForm;
@@ -16,12 +15,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Transactional
 @Service
 @RequiredArgsConstructor
 public class ItemService {
@@ -35,6 +34,7 @@ public class ItemService {
      * @param itemCreateForm
      * @return 생성된 Item의 id값
      */
+    @Transactional
     public Long create(ItemCreateForm itemCreateForm) {
         String filePath = fileManager.saveFile(itemCreateForm.getImage());
         Item item = Item.builder()
@@ -56,6 +56,7 @@ public class ItemService {
      * @param id 삭제할 아이템의 ID
      * @throws ItemNotFoundException 주어진 ID의 아이템을 찾을 수 없는 경우
      */
+    @Transactional
     public void delete(Long id) throws ItemNotFoundException {
         Item item = itemRepository.findById(id).orElseThrow(() ->
                 new ItemNotFoundException(id));
@@ -63,6 +64,7 @@ public class ItemService {
         fileManager.deleteFile(item.getImage());
     }
 
+    @Transactional(readOnly = true)
     public List<ItemResponse> findAll() {
         return itemRepository.findAll().stream()
                 .map(ItemResponse::of)
@@ -72,6 +74,7 @@ public class ItemService {
     /**
      * 생성, 수정 시간을 제외한 정보만 전달해주도록 findAll 기능추가
      */
+    @Transactional(readOnly = true)
     public List<ItemSimpleResponse> findAllItems() {
         List<Item> items = itemRepository.findAll();
         return items.stream()
@@ -91,12 +94,14 @@ public class ItemService {
      * @param pageable 페이징 정보
      * @return 페이징된 ItemResponse 목록
      */
+    @Transactional(readOnly = true)
     public Page<ItemResponse> findAll(Pageable pageable) {
         return itemRepository.findAll(pageable)
                 .map(ItemResponse::of);
     }
 
 
+    @Transactional(readOnly = true)
     public ItemResponse findById(Long id) throws ItemNotFoundException {
         return ItemResponse.of(itemRepository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException(id)
@@ -113,6 +118,7 @@ public class ItemService {
      *                     아이템의 업데이트된 상세 정보가 담긴 폼
      * @return 수정된 아이템 상세 정보가 포함된 {@code ItemResponse}
      */
+    @Transactional
     public ItemResponse edit(ItemEditForm itemEditForm) throws ItemNotFoundException {
         Item item = itemRepository.findById(itemEditForm.getId()).orElseThrow(
                 () -> new ItemNotFoundException(itemEditForm.getId())
@@ -130,6 +136,7 @@ public class ItemService {
         return ItemResponse.of(itemRepository.save(item));
     }
 
+    @Transactional(readOnly = true)
     public Resource getImage(Long itemId) {
         String filePath = findById(itemId).getImageName();
         Resource imageResource = fileManager.getFileResource(filePath);

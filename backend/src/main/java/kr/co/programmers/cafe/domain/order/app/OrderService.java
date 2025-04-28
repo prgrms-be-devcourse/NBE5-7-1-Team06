@@ -1,7 +1,6 @@
 package kr.co.programmers.cafe.domain.order.app;
 
 
-import jakarta.transaction.Transactional;
 import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.item.entity.Item;
 import kr.co.programmers.cafe.domain.mail.dto.DeliveringMailSendRequest;
@@ -17,18 +16,15 @@ import kr.co.programmers.cafe.domain.order.entity.OrderItem;
 import kr.co.programmers.cafe.domain.order.entity.Status;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -115,7 +111,7 @@ public class OrderService {
         return clientPrice != null && clientPrice == servicePrice;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("해당 주문을 찾을 수 없습니다. "));
@@ -141,7 +137,7 @@ public class OrderService {
     }
 
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
         Page<Order> ordersPage = orderRepository.findAll(pageable);
 
@@ -155,7 +151,7 @@ public class OrderService {
                 .build());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<OrderResponse> searchOrder(Long orderId) {
         Optional<Order> optionalOrder = Optional.ofNullable(orderRepository.findById(orderId).orElseThrow(
                 () -> new NoSuchElementException(" 해당 주문을 찾을 수 없습니다.")
@@ -190,7 +186,7 @@ public class OrderService {
      * 매일 오후 두 시에 주문 배송 진행
      */
     @Scheduled(cron = "0 0 14 * * *", zone = "Asia/Seoul")
-    @Transactional
+    @Transactional(readOnly = true)
     public void executeOrderDelivery() {
         List<Order> foundOrders = orderRepository.findByOrderedAtGreaterThanEqualAndStatus(
                 LocalDateTime.now(), Status.ORDERED
