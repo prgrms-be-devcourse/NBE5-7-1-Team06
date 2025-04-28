@@ -1,6 +1,7 @@
 package kr.co.programmers.cafe.domain.order.app;
 
 
+import jakarta.transaction.Transactional;
 import kr.co.programmers.cafe.domain.item.dao.ItemRepository;
 import kr.co.programmers.cafe.domain.item.entity.Item;
 import kr.co.programmers.cafe.domain.mail.dto.DeliveringMailSendRequest;
@@ -16,15 +17,19 @@ import kr.co.programmers.cafe.domain.order.entity.OrderItem;
 import kr.co.programmers.cafe.domain.order.entity.Status;
 import kr.co.programmers.cafe.global.exception.ItemNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -111,7 +116,16 @@ public class OrderService {
         return clientPrice != null && clientPrice == servicePrice;
     }
 
-    @Transactional(readOnly = true)
+    // 주문 날짜(yyyyMMdd)와 주문 ID를 결합하여 문자열을 Long으로 변환
+    private Long getFormattedOrderId(Order order) {
+
+        String formattedDate = order.getOrderedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String formattedOrderId = formattedDate + order.getId();
+
+        return Long.parseLong(formattedOrderId);
+    }
+
+    @Transactional
     public OrderResponse getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("해당 주문을 찾을 수 없습니다. "));
@@ -125,7 +139,7 @@ public class OrderService {
                 .toList();
 
         return OrderResponse.builder()
-                .orderId(order.getId())
+                .orderId(getFormattedOrderId(order))  // 실제 DB의 주문 ID
                 .email(order.getEmail())
                 .address(order.getAddress())
                 .zipCode(order.getZipCode())
@@ -137,12 +151,12 @@ public class OrderService {
     }
 
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
         Page<Order> ordersPage = orderRepository.findAll(pageable);
 
         return ordersPage.map(order -> OrderResponse.builder()
-                .orderId(order.getId())
+                .orderId(getFormattedOrderId(order))
                 .email(order.getEmail())
                 .address(order.getAddress())
                 .zipCode(order.getZipCode())
@@ -151,27 +165,31 @@ public class OrderService {
                 .build());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Optional<OrderResponse> searchOrder(Long orderId) {
-        Optional<Order> optionalOrder = Optional.ofNullable(orderRepository.findById(orderId).orElseThrow(
-                () -> new NoSuchElementException(" 해당 주문을 찾을 수 없습니다.")
-        ));
-        return optionalOrder.map(
-                order -> OrderResponse.builder()
-                        .orderId(order.getId())
-                        .email(order.getEmail())
-                        .address(order.getAddress())
-                        .zipCode(order.getZipCode())
-                        .totalPrice(order.getTotalPrice())
-                        .status(order.getStatus())
-                        .orderItems(order.getOrderItems().stream().map(
-                                        orderItem -> OrderItemResponse.builder()
-                                                .name(orderItem.getItem().getName())
-                                                .quantity(orderItem.getQuantity())
-                                                .build()
-                                ).toList()
-                        ).build()
-        );
+
+        if (String.valueOf(orderId).length() < 9) {
+            return Optional.empty(); // 주문 ID가 9자리 미만인 경우는 "존재하지 않음" 처리
+        }
+
+        String formattedOrderId = String.valueOf(orderId);
+        Long orderIdPart = Long.valueOf(formattedOrderId.substring(8));
+
+        // 주문을 찾을 수 없으면 Optional.empty() 반환
+        return orderRepository.findById(orderIdPart).map(order -> OrderResponse.builder()
+                .orderId(getFormattedOrderId(order))
+                .email(order.getEmail())
+                .address(order.getAddress())
+                .zipCode(order.getZipCode())
+                .totalPrice(order.getTotalPrice())
+                .status(order.getStatus())
+                .orderItems(order.getOrderItems().stream()
+                        .map(orderItem -> OrderItemResponse.builder()
+                                .name(orderItem.getItem().getName())
+                                .quantity(orderItem.getQuantity())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build());
     }
 
     @Transactional
