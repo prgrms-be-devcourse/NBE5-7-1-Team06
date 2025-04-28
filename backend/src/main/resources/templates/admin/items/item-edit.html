@@ -48,7 +48,9 @@
 
     <div class="form-field image-container" style="text-align: center;">
         <div class="form-field image-container" style="text-align: center;"
-             th:if="${item != null && item.image != null}" th:onerror="this.style.display='none'">
+             th:if="${itemEditForm != null && itemEditForm.imageUrl != null}" th:onerror="this.style.display='none'">
+            <img class="item-image"
+                 th:src="@{'/api/items/' + ${itemEditForm.id} + '/images'}" alt="상품 이미지">
         </div>
 
     <div class="button-container">
