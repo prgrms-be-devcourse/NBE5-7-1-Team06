@@ -83,6 +83,7 @@ public class ItemService {
                         .name(item.getName())
                         .price(item.getPrice())
                         .category(item.getCategory())
+                        .description(item.getDescription())
                         .imageName(item.getImage())
                         .build())
                 .collect(Collectors.toList());

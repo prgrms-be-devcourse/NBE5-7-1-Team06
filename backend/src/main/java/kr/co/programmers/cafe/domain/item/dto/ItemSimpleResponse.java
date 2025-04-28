@@ -13,4 +13,5 @@ public class ItemSimpleResponse {
     private Integer price;
     private Category category;
     private String imageName;
+    private String description;
 }
