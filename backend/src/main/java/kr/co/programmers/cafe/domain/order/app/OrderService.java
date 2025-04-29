@@ -99,7 +99,7 @@ public class OrderService {
         ReceiptMailSendRequest receiptMailSendRequest = ReceiptMailSendRequest.builder()
                 .orderId(order.getId())
                 .mailAddress(order.getEmail())
-                .orderedAt(order.getOrderedAt())
+                .sendTime(order.getOrderedAt())
                 .zipCode(order.getZipCode())
                 .address(order.getAddress())
                 .items(itemMailSendRequests)
@@ -264,7 +264,7 @@ public class OrderService {
                             .mailAddress(key.email)
                             .address(key.address)
                             .zipCode(key.zipCode)
-                            .deliveryStartedAt(LocalDateTime.now())
+                            .sendTime(LocalDateTime.now())
                             .totalPrice(totalPrice.get())
                             .items(itemMailSendRequests)
                             .build();

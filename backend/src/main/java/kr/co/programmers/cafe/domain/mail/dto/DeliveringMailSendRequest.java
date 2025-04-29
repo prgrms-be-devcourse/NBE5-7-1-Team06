@@ -8,11 +8,11 @@ import java.util.List;
 
 @Getter
 @Builder
-public class DeliveringMailSendRequest {
+public class DeliveringMailSendRequest extends MailSendRequest {
     private String mailAddress;
     private String address;
     private String zipCode;
     private Integer totalPrice;
-    private LocalDateTime deliveryStartedAt;
+    private LocalDateTime sendTime;
     private List<ItemMailSendRequest> items;
 }
