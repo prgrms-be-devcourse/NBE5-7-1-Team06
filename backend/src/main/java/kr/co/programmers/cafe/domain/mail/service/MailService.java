@@ -39,9 +39,9 @@ public class MailService {
 
     public void sendReceiptMail(ReceiptMailSendRequest receiptRequest) {
         Context context = new Context();
-        String orderId = receiptRequest.getOrderedAt().format(BASIC) + receiptRequest.getOrderId();
+        String orderId = receiptRequest.getSendTime().format(BASIC) + receiptRequest.getOrderId();
         context.setVariable("orderId", orderId);
-        context.setVariable("orderedAt", receiptRequest.getOrderedAt().format(DASHED));
+        context.setVariable("orderedAt", receiptRequest.getSendTime().format(DASHED));
         context.setVariable("address", receiptRequest.getAddress());
         context.setVariable("zipCode", receiptRequest.getZipCode());
         context.setVariable("items", receiptRequest.getItems());
@@ -54,7 +54,7 @@ public class MailService {
 
     public void sendDeliveringMail(DeliveringMailSendRequest deliveringRequest) {
         Context context = new Context();
-        context.setVariable("deliveryStartedAt", deliveringRequest.getDeliveryStartedAt().format(DASHED));
+        context.setVariable("deliveryStartedAt", deliveringRequest.getSendTime().format(DASHED));
         context.setVariable("address", deliveringRequest.getAddress());
         context.setVariable("zipCode", deliveringRequest.getZipCode());
         context.setVariable("items", deliveringRequest.getItems());
