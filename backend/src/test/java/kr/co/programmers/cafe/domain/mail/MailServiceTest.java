@@ -2,20 +2,20 @@ package kr.co.programmers.cafe.domain.mail;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import kr.co.programmers.cafe.domain.mail.dto.DeliveringMailSendRequest;
 import kr.co.programmers.cafe.domain.mail.dto.ItemMailSendRequest;
 import kr.co.programmers.cafe.domain.mail.dto.MailSendRequest;
 import kr.co.programmers.cafe.domain.mail.dto.ReceiptMailSendRequest;
 import kr.co.programmers.cafe.domain.mail.service.MailService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -80,6 +80,20 @@ class MailServiceTest {
                 .build();
     }
 
+    private DeliveringMailSendRequest createDummyDeliveringMailDto() {
+        List<ItemMailSendRequest> items = createDummyItems((int) (Math.random() * 5 + 1));
+        int totalPrice = items.stream().mapToInt(item -> item.getPrice() * item.getQuantity()).sum();
+
+        return DeliveringMailSendRequest.builder()
+                .mailAddress(TARGET_EMAIL)
+                .sendTime(LocalDateTime.now())
+                .address(TARGET_ADDRESS)
+                .zipCode(TARGET_ZIPCODE)
+                .items(items)
+                .totalPrice(totalPrice)
+                .build();
+    }
+
     private Message getReceivedMessage() throws MessagingException {
         greenMail.waitForIncomingEmail(5000, 1);
         MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
@@ -116,7 +130,16 @@ class MailServiceTest {
         assertThat(body).containsIgnoringNewLines(numberFormat.format(request.getTotalPrice()));
     }
 
+    /**
+     * 각 테스트 시작 전, 수신 메일 박스의 모든 메일 제거
+     */
+    @BeforeEach
+    void setUp() throws FolderException {
+        greenMail.purgeEmailFromAllMailboxes();
+    }
+
     @Test
+    @Order(1)
     @DisplayName("단일 구매 내역 메일 전송 테스트")
     void sendReceiptMailTest() throws MessagingException {
         // given - 랜덤 구매 목록 생성
@@ -141,4 +164,40 @@ class MailServiceTest {
         assertThat(body).containsIgnoringNewLines(orderId);
     }
 
+    @Test
+    @Order(2)
+    @DisplayName("단일 배송 시작 메일 전송 테스트")
+    void sendDeliveringMailTest() throws MessagingException {
+        // given
+        DeliveringMailSendRequest request = createDummyDeliveringMailDto();
+
+        // when
+        mailService.sendDeliveringMail(request);
+
+        // then
+        Message receivedMessage = getReceivedMessage();
+        String body = getMessageBody(receivedMessage);
+
+        verifyCommonMailProperties(receivedMessage, body, request);
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("다중 배송 시작 메일 전송 테스트")
+    void sendDeliveringMailsTest() {
+        // given
+        List<DeliveringMailSendRequest> requests = new ArrayList<>();
+        int requestCount = (int) (Math.random() * 50 + 1);
+        for (int i = 0; i < requestCount; i++) {
+            requests.add(createDummyDeliveringMailDto());
+        }
+
+        // when
+        mailService.sendDeliveringMails(requests);
+
+        // then
+        greenMail.waitForIncomingEmail(5000, requestCount);
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertThat(receivedMessages).hasSize(requestCount);
+    }
 }
