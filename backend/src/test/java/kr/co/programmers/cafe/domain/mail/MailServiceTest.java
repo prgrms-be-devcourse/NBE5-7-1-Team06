@@ -36,7 +36,7 @@ class MailServiceTest {
     @RegisterExtension
     private static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
             .withConfiguration(GreenMailConfiguration.aConfig().withUser("test@test.com", "test"))
-            .withPerMethodLifecycle(false);;
+            .withPerMethodLifecycle(false);
 
     @Autowired
     private MailService mailService;
@@ -94,7 +94,7 @@ class MailServiceTest {
                 .build();
     }
 
-    private Message getReceivedMessage() throws MessagingException {
+    private Message getReceivedMessage() {
         greenMail.waitForIncomingEmail(5000, 1);
         MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
         return receivedMessages[0];
@@ -104,7 +104,7 @@ class MailServiceTest {
      * Quoted Printable 인코딩 되어 있기 때문에, '=' 문자를 넣고 개행하는 경우가 있다.
      * 때문에, 각 라인 마지막에 '=' 문자를 지우고 두 줄을 합치는 작업을 수행하여 메일 본문을 얻는다.
      */
-    private String getMessageBody(Message message) throws MessagingException {
+    private String getMessageBody(Message message) {
         return GreenMailUtil.getBody(message).replaceAll("(?m)=\\r?\\n", "");
     }
 
